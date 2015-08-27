@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2015 Kloudtek Ltd
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.kloudtek.idvkey</groupId>
+    <artifactId>idvkey-sdk-java</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <description>IDVKey Java Software Development Kit</description>
+    <url>https://github.com/Kloudtek/idvkey-sdk</url>
+    <organization>
+        <name>Kloudtek</name>
+        <url>http://www.kloudtek.com</url>
+    </organization>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/Kloudtek/idvkey-sdk/issues</url>
+    </issueManagement>
+    <scm>
+        <url>scm:git:git@github.com:Kloudtek/idvkey-sdk.git</url>
+        <connection>scm:git:git@github.com:Kloudtek/idvkey-sdk.git</connection>
+        <developerConnection>scm:git:git@github.com:Kloudtek/idvkey-sdk.git</developerConnection>
+    </scm>
+    <properties>
+        <repo.oss.snapshot.url/>
+        <repo.oss.release.url/>
+    </properties>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>com.kloudtek.kryptotek</groupId>
+            <artifactId>kryptotek-rest-client-httpcomponents</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <!--
+                You'll need to include this in your POM (or use htc-standard profile below) to run in standard java.
+                When running on android uses instead httpclient-android
+        -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+    <profiles>
+        <profile>
+            <id>htc-standard</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                    <version>4.5</version>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>htc-android</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient-android</artifactId>
+                    <version>4.3.5.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>1.6</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+    <distributionManagement>
+        <repository>
+            <id>kloudtek-oss-releases</id>
+            <name>Kloudtek OSS Releases Repository</name>
+            <url>${repo.oss.release.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>kloudtek-oss-snapshots</id>
+            <name>Kloudtek OSS Snapshots Repository</name>
+            <url>${repo.oss.snapshot.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>
