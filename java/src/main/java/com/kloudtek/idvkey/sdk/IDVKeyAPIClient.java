@@ -18,12 +18,14 @@ import com.kloudtek.util.io.IOUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
 
+import static com.kloudtek.util.StringUtils.urlEncode;
 import static org.apache.http.auth.AuthScope.ANY;
 
 /**
@@ -76,17 +78,65 @@ public class IDVKeyAPIClient {
         }
     }
 
-    public String linkUser(String websiteDomain) throws IOException {
-        final CloseableHttpResponse response = httpClient.execute(new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/linkuser/" + StringUtils.urlEncode(websiteDomain)).toUri()));
+    public UserLinkResponse linkUserToCustomerService(String websiteDomain, String finalUrl, String userRef) throws IOException {
+        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
+                urlEncode(websiteDomain) + "/link/" + urlEncode(userRef)).toUri());
+        final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new URLBuilder(serverUrl).addPath("s/linktoservice.xhtml").add("token", token).toString();
+        return new UserLinkResponse(token, new URLBuilder(serverUrl).addPath("s/linktoservice.xhtml").add("token", token).add("url", finalUrl).toString());
+    }
+
+    public boolean checkUserLinkedToCustomerService(String websiteDomain, String finalUrl, String userRef) throws IOException {
+        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
+                urlEncode(websiteDomain) + "/link/" + urlEncode(userRef)).toUri());
+        final CloseableHttpResponse response = httpClient.execute(req);
+        final int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode == 404) {
+            return false;
+        } else if (statusCode == 204) {
+            return true;
+        } else {
+            throw new IOException("Server returned " + response.getStatusLine());
+        }
     }
 
     private void checkStatus(CloseableHttpResponse response) throws IOException {
         final int retCode = response.getStatusLine().getStatusCode();
         if (retCode < 200 || retCode > 299) {
             throw new IOException("Server returned " + response.getStatusLine());
+        }
+    }
+
+    public boolean isUserLinked(String domain, String userRef) throws IOException {
+        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
+                urlEncode(domain) + "/link/" + urlEncode(userRef)).toUri());
+        final CloseableHttpResponse response = httpClient.execute(req);
+        final int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode == 404) {
+            return false;
+        } else if (statusCode == 200) {
+            return true;
+        } else {
+            throw new IOException("Server returned " + response.getStatusLine());
+        }
+    }
+
+    public class UserLinkResponse {
+        private String token;
+        private String url;
+
+        public UserLinkResponse(String token, String url) {
+            this.token = token;
+            this.url = url;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public String getUrl() {
+            return url;
         }
     }
 }
