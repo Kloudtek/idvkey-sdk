@@ -4,6 +4,7 @@
 
 package com.kloudtek.idvkey.sdk;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kloudtek.kryptotek.DigestAlgorithm;
 import com.kloudtek.kryptotek.jce.JCECryptoEngine;
 import com.kloudtek.kryptotek.key.SignAndVerifyKey;
@@ -24,24 +25,39 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.IOException;
+import java.net.URL;
 
 import static com.kloudtek.util.StringUtils.urlEncode;
 import static org.apache.http.auth.AuthScope.ANY;
 
 /**
- * Created by yannick on 27/08/15.
+ * Allows to perform API operations on the IDVKey services
  */
 public class IDVKeyAPIClient {
     public static final int DEFAULT_TIMEOUT = 30000;
     protected CloseableHttpClient httpClient;
     protected String serverUrl;
+    private static final ObjectMapper jsonMapper = new ObjectMapper();
 
-    public IDVKeyAPIClient(String id, SignAndVerifyKey hmacKey) {
-        this(id, hmacKey, hmacKey, DEFAULT_TIMEOUT);
+    /**
+     * Constructor
+     *
+     * @param id  Key id
+     * @param key A {@link SignAndVerifyKey} key
+     */
+    public IDVKeyAPIClient(String id, SignAndVerifyKey key) {
+        this(id, key, key, DEFAULT_TIMEOUT);
     }
 
-    public IDVKeyAPIClient(String serverUrl, String id, SignAndVerifyKey hmacKey) {
-        this(serverUrl, id, hmacKey, hmacKey, DEFAULT_TIMEOUT);
+    /**
+     * Contructor (only use this to connect to IDVKey test server)
+     *
+     * @param serverUrl Server URL
+     * @param id        Key id
+     * @param key       A {@link SignAndVerifyKey} key
+     */
+    public IDVKeyAPIClient(String serverUrl, String id, SignAndVerifyKey key) {
+        this(serverUrl, id, key, key, DEFAULT_TIMEOUT);
     }
 
     public IDVKeyAPIClient(String id, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
@@ -70,6 +86,9 @@ public class IDVKeyAPIClient {
         close();
     }
 
+    /**
+     * Close the client and release resources
+     */
     public void close() {
         try {
             httpClient.close();
@@ -78,39 +97,37 @@ public class IDVKeyAPIClient {
         }
     }
 
-    public UserLinkResponse linkUserToCustomerService(String websiteDomain, String finalUrl, String userRef) throws IOException {
+    /**
+     * Link an IDVKey user to your website.
+     * You need to call this operation before a user on your website can use his IDVKey device
+     *
+     * @param domain      Your website domain
+     * @param redirectUrl The URL to which the user's browser will be redirected to after he's approved the link
+     * @param userRef     User reference (generally the user's username on your website)
+     * @return URL you should redirect your user's browser to, in order for him to approve the linking
+     * @throws IOException If the server returned an error
+     */
+    public URL linkUserToCustomerService(String domain, String redirectUrl, String userRef) throws IOException {
         final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(websiteDomain) + "/link/" + urlEncode(userRef)).toUri());
+                urlEncode(domain) + "/" + urlEncode(userRef) + "/link").toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new UserLinkResponse(token, new URLBuilder(serverUrl).addPath("s/linktoservice.xhtml").add("token", token).add("url", finalUrl).toString());
+        return new URLBuilder(serverUrl).addPath("s/linktoservice.xhtml").add("token", token).add("url", redirectUrl).toUrl();
     }
 
-    public boolean checkUserLinkedToCustomerService(String websiteDomain, String finalUrl, String userRef) throws IOException {
-        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(websiteDomain) + "/link/" + urlEncode(userRef)).toUri());
-        final CloseableHttpResponse response = httpClient.execute(req);
-        final int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode == 404) {
-            return false;
-        } else if (statusCode == 204) {
-            return true;
-        } else {
-            throw new IOException("Server returned " + response.getStatusLine());
-        }
-    }
-
-    private void checkStatus(CloseableHttpResponse response) throws IOException {
-        final int retCode = response.getStatusLine().getStatusCode();
-        if (retCode < 200 || retCode > 299) {
-            throw new IOException("Server returned " + response.getStatusLine());
-        }
-    }
-
+    /**
+     * Check if a user has been linked against your website.
+     * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUserToCustomerService(String, String, String)}.
+     *
+     * @param domain  Website domain
+     * @param userRef User reference (generally the user's username on your website)
+     * @return true if the user is linked against your website
+     * @throws IOException If the server returned an error
+     */
     public boolean isUserLinked(String domain, String userRef) throws IOException {
         final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/link/" + urlEncode(userRef)).toUri());
+                urlEncode(domain) + "/" + urlEncode(userRef) + "/link").toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == 404) {
@@ -122,21 +139,31 @@ public class IDVKeyAPIClient {
         }
     }
 
-    public class UserLinkResponse {
-        private String token;
-        private String url;
+    /**
+     * Initiate an IDVKey authentication for a user
+     *
+     * @param domain      Website domain
+     * @param userRef     User reference (generally the user's username on your website)
+     * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
+     * @return Operation result. This will contain the URL you should redirect your user's browser to
+     * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
+     * authentication successfully ({@link OperationResult#getOpId()})
+     * @throws IOException
+     */
+    public OperationResult authenticateUser(String domain, String userRef, String redirectUrl) throws IOException {
+        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
+                urlEncode(domain) + "/" + urlEncode(userRef) + "/auth").toUri());
+        final CloseableHttpResponse response = httpClient.execute(req);
+        checkStatus(response);
+        final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("s/authenticate.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
+    }
 
-        public UserLinkResponse(String token, String url) {
-            this.token = token;
-            this.url = url;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public String getUrl() {
-            return url;
+    private void checkStatus(CloseableHttpResponse response) throws IOException {
+        final int retCode = response.getStatusLine().getStatusCode();
+        if (retCode < 200 || retCode > 299) {
+            throw new IOException("Server returned " + response.getStatusLine());
         }
     }
+
 }
