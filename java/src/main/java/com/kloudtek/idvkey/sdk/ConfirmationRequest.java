@@ -7,7 +7,7 @@ package com.kloudtek.idvkey.sdk;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Created by yannick on 29/08/15.
+ * Used to request a confirmation from a user
  */
 public class ConfirmationRequest {
     @JsonProperty
