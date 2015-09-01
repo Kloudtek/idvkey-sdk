@@ -109,7 +109,7 @@ public class IDVKeyAPIClient {
      */
     public URL linkUserToCustomerService(String domain, String redirectUrl, String userRef) throws IOException {
         final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/" + urlEncode(userRef) + "/link").toUri());
+                urlEncode(domain) + "/link/" + urlEncode(userRef)).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
@@ -127,7 +127,7 @@ public class IDVKeyAPIClient {
      */
     public boolean isUserLinked(String domain, String userRef) throws IOException {
         final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/" + urlEncode(userRef) + "/link").toUri());
+                urlEncode(domain) + "/link/" + urlEncode(userRef)).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == 404) {
@@ -143,20 +143,26 @@ public class IDVKeyAPIClient {
      * Initiate an IDVKey authentication for a user
      *
      * @param domain      Website domain
-     * @param userRef     User reference (generally the user's username on your website)
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
      * @return Operation result. This will contain the URL you should redirect your user's browser to
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException
      */
-    public OperationResult authenticateUser(String domain, String userRef, String redirectUrl) throws IOException {
+    public OperationResult authenticateUser(String domain, String redirectUrl) throws IOException {
         final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/" + urlEncode(userRef) + "/auth").toUri());
+                urlEncode(domain) + "/auth").toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
-        final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("s/authenticate.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
+        final Long opId = Long.parseLong(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
+        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("s/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
+    }
+
+    public String confirmUserAuthentication(Long opId) throws IOException {
+        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/confirmauth/" + opId).toUri());
+        final CloseableHttpResponse response = httpClient.execute(req);
+        checkStatus(response);
+        return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
     }
 
     private void checkStatus(CloseableHttpResponse response) throws IOException {
@@ -165,5 +171,4 @@ public class IDVKeyAPIClient {
             throw new IOException("Server returned " + response.getStatusLine());
         }
     }
-
 }
