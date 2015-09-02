@@ -11,6 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ConfirmationRequest {
     @JsonProperty
+    protected String domain;
+    @JsonProperty
+    protected String userRef;
+    @JsonProperty
     protected String text;
     @JsonProperty
     protected boolean centeredHorizontal = true;
