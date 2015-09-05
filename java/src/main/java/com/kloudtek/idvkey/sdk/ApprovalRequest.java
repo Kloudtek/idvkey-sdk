@@ -9,11 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Used to request a confirmation from a user
  */
-public class ConfirmationRequest {
+public class ApprovalRequest {
     @JsonProperty
-    protected String domain;
-    @JsonProperty
-    protected String userRef;
+    protected String title;
     @JsonProperty
     protected String text;
     @JsonProperty
@@ -29,11 +27,19 @@ public class ConfirmationRequest {
     @JsonProperty
     protected String approveMsg;
 
-    public ConfirmationRequest() {
+    public ApprovalRequest() {
     }
 
-    public ConfirmationRequest(String text) {
+    public ApprovalRequest(String text) {
         this.text = text;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getText() {
