@@ -150,7 +150,7 @@ public class IDVKeyAPIClient {
      * @throws IOException
      */
     public OperationResult authenticateUser(String domain, String redirectUrl) throws IOException {
-        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/authentication/request//" +
+        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/authentication/request/" +
                 urlEncode(domain)).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
