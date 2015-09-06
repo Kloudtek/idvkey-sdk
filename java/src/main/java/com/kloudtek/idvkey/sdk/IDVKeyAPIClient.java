@@ -108,8 +108,8 @@ public class IDVKeyAPIClient {
      * @throws IOException If the server returned an error
      */
     public URL linkUserToCustomerService(String domain, String redirectUrl, String userRef) throws IOException {
-        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/link/" + urlEncode(userRef)).toUri());
+        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/linkuser/" +
+                urlEncode(domain) + "/" + urlEncode(userRef)).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
@@ -126,8 +126,8 @@ public class IDVKeyAPIClient {
      * @throws IOException If the server returned an error
      */
     public boolean isUserLinked(String domain, String userRef) throws IOException {
-        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/link/" + urlEncode(userRef)).toUri());
+        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/linkuser/" +
+                urlEncode(domain) + "/" + urlEncode(userRef)).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == 404) {
@@ -150,8 +150,8 @@ public class IDVKeyAPIClient {
      * @throws IOException
      */
     public OperationResult authenticateUser(String domain, String redirectUrl) throws IOException {
-        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/" +
-                urlEncode(domain) + "/auth").toUri());
+        final HttpPost req = new HttpPost(new URLBuilder(serverUrl).addPath("api/idvkey/authentication/request//" +
+                urlEncode(domain)).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final Long opId = Long.parseLong(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
@@ -159,7 +159,7 @@ public class IDVKeyAPIClient {
     }
 
     public String confirmUserAuthentication(Long opId) throws IOException {
-        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/customerservice/confirmauth/" + opId).toUri());
+        final HttpGet req = new HttpGet(new URLBuilder(serverUrl).addPath("api/idvkey/authentication/confirm/" + opId).toUri());
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
