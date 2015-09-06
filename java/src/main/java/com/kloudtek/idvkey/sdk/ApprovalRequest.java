@@ -5,6 +5,7 @@
 package com.kloudtek.idvkey.sdk;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Used to request a confirmation from a user
@@ -30,7 +31,8 @@ public class ApprovalRequest {
     public ApprovalRequest() {
     }
 
-    public ApprovalRequest(String text) {
+    public ApprovalRequest(@NotNull String title, @NotNull String text) {
+        this.title = title;
         this.text = text;
     }
 
@@ -38,7 +40,7 @@ public class ApprovalRequest {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NotNull String title) {
         this.title = title;
     }
 
@@ -46,7 +48,7 @@ public class ApprovalRequest {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(@NotNull String text) {
         this.text = text;
     }
 

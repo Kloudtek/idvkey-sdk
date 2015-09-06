@@ -10,10 +10,10 @@ import java.net.URL;
  * Operation result, which is returned by IDVKey when you request any kind of user authentication operation.
  */
 public class OperationResult {
-    private Long opId;
+    private String opId;
     private URL redirectUrl;
 
-    public OperationResult(Long opId, URL redirectUrl) {
+    public OperationResult(String opId, URL redirectUrl) {
         this.opId = opId;
         this.redirectUrl = redirectUrl;
     }
@@ -23,7 +23,7 @@ public class OperationResult {
      *
      * @return operation id
      */
-    public Long getOpId() {
+    public String getOpId() {
         return opId;
     }
 
