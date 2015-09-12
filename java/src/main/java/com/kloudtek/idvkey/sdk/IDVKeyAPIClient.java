@@ -79,7 +79,7 @@ public class IDVKeyAPIClient {
         httpClientBuilder.setDefaultRequestConfig(requestBuilder.build());
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         // This is used to used to adjust http timestamps in case client has the wrong time
-        final TimeAsHttpContentTimeSync timeSync = new TimeAsHttpContentTimeSync(new URLBuilder(serverUrl).addPath("/time").toString());
+        final TimeAsHttpContentTimeSync timeSync = new TimeAsHttpContentTimeSync(new URLBuilder(serverUrl).addPath("/public/time").toString());
         credentialsProvider.setCredentials(ANY, new RestAuthCredential(id, signingKey, signatureVerificationKey,
                 DigestAlgorithm.SHA256, timeSync));
         httpClient = httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider).build();
@@ -117,7 +117,7 @@ public class IDVKeyAPIClient {
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new URLBuilder(serverUrl).addPath("s/linktoservice.xhtml").add("token", token).add("url", redirectUrl).toUrl();
+        return new URLBuilder(serverUrl).addPath("linktoservice.xhtml").add("token", token).add("url", redirectUrl).toUrl();
     }
 
     /**
@@ -155,7 +155,7 @@ public class IDVKeyAPIClient {
     public OperationResult authenticateUser(@NotNull String domain, @NotNull String redirectUrl) throws IOException {
         final CloseableHttpResponse response = get("api/idvkey/authentication/request/" + urlEncode(domain));
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("s/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
+        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
     }
 
     /**
@@ -191,7 +191,7 @@ public class IDVKeyAPIClient {
         }
         final CloseableHttpResponse response = postJson("api/idvkey/approval/request/" + urlEncode(domain) + "/" + urlEncode(userRef), approvalRequest);
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
+        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
 
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
