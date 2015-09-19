@@ -178,7 +178,7 @@ public class IDVKeyAPIClient {
      * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired)
      * @param approvalRequest Approval request details
      * @return Operation results
-     * @throws IOException
+     * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
     public OperationResult requestApproval(@NotNull String domain, @NotNull String userRef, @NotNull String redirectUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
@@ -194,6 +194,13 @@ public class IDVKeyAPIClient {
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
 
+    /**
+     * Check what is the approval state of an operation
+     *
+     * @param opId Operation Id
+     * @return approval state
+     * @throws IOException If an error occurs while performing the operation
+     */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
         final CloseableHttpResponse response = get("api/idvkey/approval/state/" + urlEncode(opId));
         final String state = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
