@@ -112,7 +112,7 @@ public class IDVKeyAPIClient {
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException If the server returned an error
      */
-    public URL linkUserToCustomerService(String domain, String redirectUrl, String userRef) throws IOException {
+    public URL linkUserToWebsite(String domain, String redirectUrl, String userRef) throws IOException {
         final HttpPost req = new HttpPost(buildUrl("api/idvkey/linkuser/" + urlEncode(domain) + "/" + urlEncode(userRef)));
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
@@ -122,7 +122,7 @@ public class IDVKeyAPIClient {
 
     /**
      * Check if a user has been linked against your website.
-     * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUserToCustomerService(String, String, String)}.
+     * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUserToWebsite(String, String, String)}.
      *
      * @param domain  Website domain
      * @param userRef User reference (generally the user's username on your website)
