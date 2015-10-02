@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Kloudtek Ltd
  */
 
-package com.kloudtek.idvkey.sdk;
+package com.kloudtek.idvkey.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

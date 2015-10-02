@@ -15,6 +15,8 @@
 
     <modules>
         <module>java</module>
+        <module>simulator</module>
+        <module>api</module>
     </modules>
 
     <description>IDVKey Java Software Development Kit</description>
@@ -35,6 +37,7 @@
     <properties>
         <repo.oss.snapshot.url/>
         <repo.oss.release.url/>
+        <kryptotek-oss.version>1.0.3</kryptotek-oss.version>
     </properties>
     <licenses>
         <license>

@@ -5,6 +5,9 @@
 package com.kloudtek.idvkey.sdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kloudtek.idvkey.api.ApprovalRequest;
+import com.kloudtek.idvkey.api.ApprovalState;
+import com.kloudtek.idvkey.api.OperationResult;
 import com.kloudtek.kryptotek.DigestAlgorithm;
 import com.kloudtek.kryptotek.jce.JCECryptoEngine;
 import com.kloudtek.kryptotek.key.SignAndVerifyKey;
@@ -106,14 +109,14 @@ public class IDVKeyAPIClient {
      * Link an IDVKey user to your website.
      * You need to call this operation before a user on your website can use his IDVKey device
      *
-     * @param domain      Your website domain
+     * @param serviceId      Your website serviceId
      * @param redirectUrl The URL to which the user's browser will be redirected to after he's approved the link
      * @param userRef     User reference (generally the user's username on your website)
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException If the server returned an error
      */
-    public URL linkUserToWebsite(String domain, String redirectUrl, String userRef) throws IOException {
-        final HttpPost req = new HttpPost(buildUrl("api/idvkey/linkuser/" + urlEncode(domain) + "/" + urlEncode(userRef)));
+    public URL linkUserToWebsite(String serviceId, String redirectUrl, String userRef) throws IOException {
+        final HttpPost req = new HttpPost(buildUrl("api/idvkey/linkuser/" + urlEncode(serviceId) + "/" + urlEncode(userRef)));
         final CloseableHttpResponse response = httpClient.execute(req);
         checkStatus(response);
         final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
@@ -124,19 +127,19 @@ public class IDVKeyAPIClient {
      * Check if a user has been linked against your website.
      * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUserToWebsite(String, String, String)}.
      *
-     * @param domain  Website domain
+     * @param serviceId  Website serviceId
      * @param userRef User reference (generally the user's username on your website)
      * @return true if the user is linked against your website
      * @throws IOException If error occurred performing the operation
      */
-    public boolean isUserLinked(String domain, String userRef) throws IOException {
-        final HttpGet req = new HttpGet(buildUrl("api/idvkey/linkuser/" + urlEncode(domain) + "/" + urlEncode(userRef)));
+    public boolean isUserLinked(String serviceId, String userRef) throws IOException {
+        final HttpGet req = new HttpGet(buildUrl("api/idvkey/linkuser/" + urlEncode(serviceId) + "/" + urlEncode(userRef)));
         final CloseableHttpResponse response = httpClient.execute(req);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == 404) {
             return false;
         } else if (statusCode == 200) {
-            return true;
+            return Boolean.parseBoolean(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
         } else {
             throw new IOException("Server returned " + response.getStatusLine());
         }
@@ -145,15 +148,15 @@ public class IDVKeyAPIClient {
     /**
      * Initiate an IDVKey authentication for a user
      *
-     * @param domain      Website domain
+     * @param serviceId      Website serviceId
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
      * @return Operation result. This will contain the URL you should redirect your user's browser to
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException If error occurred performing the operation
      */
-    public OperationResult authenticateUser(@NotNull String domain, @NotNull String redirectUrl) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/authentication/request/" + urlEncode(domain));
+    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl) throws IOException {
+        final CloseableHttpResponse response = get("api/idvkey/authentication/request/" + urlEncode(serviceId));
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
     }
@@ -173,7 +176,7 @@ public class IDVKeyAPIClient {
     /**
      * Request for a user to approve an operation using IDVKey
      *
-     * @param domain          Domain
+     * @param serviceId          serviceId
      * @param userRef         User ref
      * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired)
      * @param approvalRequest Approval request details
@@ -181,7 +184,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
-    public OperationResult requestApproval(@NotNull String domain, @NotNull String userRef, @NotNull String redirectUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
+    public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull String redirectUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
         if (approvalRequest == null) {
             throw new IllegalArgumentException("approval request missing");
         } else if (StringUtils.isBlank(approvalRequest.getTitle())) {
@@ -189,7 +192,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final CloseableHttpResponse response = postJson("api/idvkey/approval/request/" + urlEncode(domain) + "/" + urlEncode(userRef), approvalRequest);
+        final CloseableHttpResponse response = postJson("api/idvkey/approval/request/" + urlEncode(serviceId) + "/" + urlEncode(userRef), approvalRequest);
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
