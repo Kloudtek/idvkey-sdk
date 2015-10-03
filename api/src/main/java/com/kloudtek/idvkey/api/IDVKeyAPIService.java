@@ -13,31 +13,44 @@ import javax.ws.rs.core.SecurityContext;
  */
 public interface IDVKeyAPIService {
     /**
-     * Request a user for his permission to link him to a customer service/website
+     * Request a user for his permission to link him to a customer service/website.
      *
+     * @return URL to redirect user for him to perform authentication
      * @param serviceId       Website service id
      * @param userRef         User reference that will represent this user within the specified service/website
-     * @param securityContext AJAX security context
-     * @return Operation Id
+     * @param redirectUrl     URL to redirect to after user approval is completed
+     * @param securityContext AJAX security context  @return Operation Id
      */
     @POST
-    @Path("linkuser/{serviceId}/{userRef}")
+    @Path("service/{serviceId}/{userRef}")
     @AuthenticateCustomer
     String linkUserToCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
-                                     @Context SecurityContext securityContext);
+                                     String redirectUrl, @Context SecurityContext securityContext);
 
     @GET
-    @Path("linkuser/{serviceId}/{userRef}")
+    @Path("service/{serviceId}/{userRef}")
     @AuthenticateCustomer
     @Produces("text/plain")
     boolean isUserLinkedToCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
                                           @Context SecurityContext securityContext);
+
+    @DELETE
+    @Path("service/{serviceId}/{userRef}")
+    @AuthenticateCustomer
+    void unlinkUserFromCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
+                                       @Context SecurityContext securityContext);
 
     @GET
     @Path("authentication/request/{serviceId}")
     @AuthenticateCustomer
     String requestUserAuthentication(@PathParam("serviceId") String serviceId, @Context SecurityContext securityContext);
 
+    /**
+     * Get the user ref for the user authenticated with that operation id
+     *
+     * @param opId Operation id
+     * @return User ref
+     */
     @GET
     @Path("authentication/confirm/{opId}")
     @AuthenticateCustomer

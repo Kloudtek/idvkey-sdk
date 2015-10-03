@@ -20,12 +20,10 @@ import com.kloudtek.util.StringUtils;
 import com.kloudtek.util.URLBuilder;
 import com.kloudtek.util.io.IOUtils;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -106,7 +104,7 @@ public class IDVKeyAPIClient {
     }
 
     /**
-     * Link an IDVKey user to your website.
+     * Link an IDVKey user to your service/website.
      * You need to call this operation before a user on your website can use his IDVKey device
      *
      * @param serviceId      Your website serviceId
@@ -115,17 +113,34 @@ public class IDVKeyAPIClient {
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException If the server returned an error
      */
-    public URL linkUserToWebsite(String serviceId, String redirectUrl, String userRef) throws IOException {
-        final HttpPost req = new HttpPost(buildUrl("api/idvkey/linkuser/" + urlEncode(serviceId) + "/" + urlEncode(userRef)));
+    public URL linkUser(String serviceId, String redirectUrl, String userRef) throws IOException, UserAlreadyLinkedException {
+        final HttpPost req = new HttpPost(buildUserUrl(serviceId, userRef));
+        req.setEntity(new StringEntity(redirectUrl));
         final CloseableHttpResponse response = httpClient.execute(req);
-        checkStatus(response);
-        final String token = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
-        return new URLBuilder(serverUrl).addPath("linktoservice.xhtml").add("token", token).add("url", redirectUrl).toUrl();
+        final int retCode = response.getStatusLine().getStatusCode();
+        if (retCode == 409) {
+            throw new UserAlreadyLinkedException();
+        } else if (retCode < 200 || retCode > 299) {
+            throw new IOException("Server returned " + response.getStatusLine());
+        }
+        return new URL(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
+    }
+
+    /**
+     * Unlink an IDVKey user to your service/website.
+     *
+     * @param serviceId Your website serviceId
+     * @param userRef   User reference (generally the user's username on your website)
+     * @throws IOException If the server returned an error
+     */
+    public void unlinkUser(String serviceId, String userRef) throws IOException, UserAlreadyLinkedException {
+        final HttpDelete req = new HttpDelete(buildUserUrl(serviceId, userRef));
+        checkStatus(httpClient.execute(req));
     }
 
     /**
      * Check if a user has been linked against your website.
-     * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUserToWebsite(String, String, String)}.
+     * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUser(String, String, String)}.
      *
      * @param serviceId  Website serviceId
      * @param userRef User reference (generally the user's username on your website)
@@ -133,7 +148,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public boolean isUserLinked(String serviceId, String userRef) throws IOException {
-        final HttpGet req = new HttpGet(buildUrl("api/idvkey/linkuser/" + urlEncode(serviceId) + "/" + urlEncode(userRef)));
+        final HttpGet req = new HttpGet(buildUserUrl(serviceId, userRef));
         final CloseableHttpResponse response = httpClient.execute(req);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == 404) {
@@ -239,5 +254,9 @@ public class IDVKeyAPIClient {
 
     private URI buildUrl(String path) {
         return new URLBuilder(serverUrl).addPath(path).toUri();
+    }
+
+    private URI buildUserUrl(String serviceId, String userRef) {
+        return buildUrl("api/idvkey/service/" + urlEncode(serviceId) + "/" + urlEncode(userRef));
     }
 }
