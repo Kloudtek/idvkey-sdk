@@ -40,10 +40,10 @@ public interface IDVKeyAPIService {
     void unlinkUserFromCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
                                        @Context SecurityContext securityContext);
 
-    @GET
-    @Path("authentication/request/{serviceId}")
+    @POST
+    @Path("authenticate")
     @AuthenticateCustomer
-    String requestUserAuthentication(@PathParam("serviceId") String serviceId, @Context SecurityContext securityContext);
+    String requestUserAuthentication(String serviceId, @Context SecurityContext securityContext);
 
     /**
      * Get the user ref for the user authenticated with that operation id
@@ -52,12 +52,12 @@ public interface IDVKeyAPIService {
      * @return User ref
      */
     @GET
-    @Path("authentication/confirm/{opId}")
+    @Path("authenticate/{opId}")
     @AuthenticateCustomer
     String confirmUserAuthentication(@PathParam("opId") Long opId);
 
     @POST
-    @Path("approval/request/{serviceId}/{userRef}")
+    @Path("service/{serviceId}/{userRef}/approve")
     @AuthenticateCustomer
     @Consumes("application/json")
     @Produces("text/plain")
@@ -65,7 +65,7 @@ public interface IDVKeyAPIService {
                            ApprovalRequest req, @Context SecurityContext securityContext);
 
     @GET
-    @Path("approval/state/{opId}")
+    @Path("approve/{opId}")
     @AuthenticateCustomer
     @Produces("text/plain")
     ApprovalState getUserApprovalState(@PathParam("opId") String opId, @Context SecurityContext securityContext);

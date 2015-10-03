@@ -171,7 +171,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/authentication/request/" + urlEncode(serviceId));
+        final CloseableHttpResponse response = post("api/idvkey/authenticate", serviceId);
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
     }
@@ -184,7 +184,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public String confirmUserAuthentication(@NotNull String opId) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/authentication/confirm/" + opId);
+        final CloseableHttpResponse response = get("api/idvkey/authenticate/" + opId);
         return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
     }
 
@@ -207,7 +207,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final CloseableHttpResponse response = postJson("api/idvkey/approval/request/" + urlEncode(serviceId) + "/" + urlEncode(userRef), approvalRequest);
+        final CloseableHttpResponse response = postJson("api/idvkey/service/" + urlEncode(serviceId) + "/" + urlEncode(userRef) + "/approve", approvalRequest);
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
@@ -220,7 +220,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/approval/state/" + urlEncode(opId));
+        final CloseableHttpResponse response = get("api/idvkey/approve/" + urlEncode(opId));
         final String state = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         try {
             return ApprovalState.valueOf(state);
@@ -243,6 +243,12 @@ public class IDVKeyAPIClient {
     private CloseableHttpResponse postJson(String path, Object obj) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
         post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
+        return exec(post);
+    }
+
+    private CloseableHttpResponse post(String path, String string) throws IOException {
+        final HttpPost post = new HttpPost(buildUrl(path));
+        post.setEntity(new StringEntity(string));
         return exec(post);
     }
 
