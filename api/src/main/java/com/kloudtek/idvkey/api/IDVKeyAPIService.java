@@ -22,22 +22,22 @@ public interface IDVKeyAPIService {
      * @param securityContext AJAX security context  @return Operation Id
      */
     @POST
-    @Path("service/{serviceId}/{userRef}")
+    @Path("linkuser")
     @AuthenticateCustomer
-    String linkUserToCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
+    String linkUserToCustomerService(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
                                      String redirectUrl, @Context SecurityContext securityContext);
 
     @GET
-    @Path("service/{serviceId}/{userRef}")
+    @Path("linkuser")
     @AuthenticateCustomer
     @Produces("text/plain")
-    boolean isUserLinkedToCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
+    boolean isUserLinkedToCustomerService(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
                                           @Context SecurityContext securityContext);
 
     @DELETE
-    @Path("service/{serviceId}/{userRef}")
+    @Path("linkuser")
     @AuthenticateCustomer
-    void unlinkUserFromCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
+    void unlinkUserFromCustomerService(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
                                        @Context SecurityContext securityContext);
 
     @POST
@@ -52,21 +52,21 @@ public interface IDVKeyAPIService {
      * @return User ref
      */
     @GET
-    @Path("authenticate/{opId}")
+    @Path("authenticate")
     @AuthenticateCustomer
-    String confirmUserAuthentication(@PathParam("opId") Long opId);
+    String confirmUserAuthentication(@QueryParam("opId") String opId);
 
     @POST
-    @Path("service/{serviceId}/{userRef}/approve")
+    @Path("approve")
     @AuthenticateCustomer
     @Consumes("application/json")
     @Produces("text/plain")
-    String requestApproval(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef,
+    String requestApproval(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
                            ApprovalRequest req, @Context SecurityContext securityContext);
 
     @GET
-    @Path("approve/{opId}")
+    @Path("approve")
     @AuthenticateCustomer
     @Produces("text/plain")
-    ApprovalState getUserApprovalState(@PathParam("opId") String opId, @Context SecurityContext securityContext);
+    ApprovalState getUserApprovalState(@QueryParam("opId") String opId, @Context SecurityContext securityContext);
 }

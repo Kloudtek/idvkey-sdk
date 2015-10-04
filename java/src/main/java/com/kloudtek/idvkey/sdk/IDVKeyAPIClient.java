@@ -114,7 +114,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If the server returned an error
      */
     public URL linkUser(String serviceId, String redirectUrl, String userRef) throws IOException, UserAlreadyLinkedException {
-        final HttpPost req = new HttpPost(buildUserUrl(serviceId, userRef));
+        final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef));
         req.setEntity(new StringEntity(redirectUrl));
         final CloseableHttpResponse response = httpClient.execute(req);
         final int retCode = response.getStatusLine().getStatusCode();
@@ -134,7 +134,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If the server returned an error
      */
     public void unlinkUser(String serviceId, String userRef) throws IOException, UserAlreadyLinkedException {
-        final HttpDelete req = new HttpDelete(buildUserUrl(serviceId, userRef));
+        final HttpDelete req = new HttpDelete(linkUserUrl(serviceId, userRef));
         checkStatus(httpClient.execute(req));
     }
 
@@ -148,7 +148,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public boolean isUserLinked(String serviceId, String userRef) throws IOException {
-        final HttpGet req = new HttpGet(buildUserUrl(serviceId, userRef));
+        final HttpGet req = new HttpGet(linkUserUrl(serviceId, userRef));
         final CloseableHttpResponse response = httpClient.execute(req);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == 404) {
@@ -184,7 +184,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public String confirmUserAuthentication(@NotNull String opId) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/authenticate/" + opId);
+        final CloseableHttpResponse response = get("api/idvkey/authenticate?opId=" + urlEncode(opId));
         return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
     }
 
@@ -207,7 +207,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final CloseableHttpResponse response = postJson("api/idvkey/service/" + urlEncode(serviceId) + "/" + urlEncode(userRef) + "/approve", approvalRequest);
+        final CloseableHttpResponse response = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId).add("userRef", userRef).toString(), approvalRequest);
         final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
@@ -220,7 +220,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/approve/" + urlEncode(opId));
+        final CloseableHttpResponse response = get("api/idvkey/approve?opId=" + urlEncode(opId));
         final String state = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
         try {
             return ApprovalState.valueOf(state);
@@ -258,11 +258,16 @@ public class IDVKeyAPIClient {
         return response;
     }
 
+    private URLBuilder url(String path) {
+        return new URLBuilder(serverUrl).addPath(path);
+    }
+
     private URI buildUrl(String path) {
         return new URLBuilder(serverUrl).addPath(path).toUri();
     }
 
-    private URI buildUserUrl(String serviceId, String userRef) {
-        return buildUrl("api/idvkey/service/" + urlEncode(serviceId) + "/" + urlEncode(userRef));
+    private URI linkUserUrl(String serviceId, String userRef) {
+        return url("api/idvkey/linkuser").add("serviceId", serviceId).add("userRef", userRef).toUri();
     }
+
 }
