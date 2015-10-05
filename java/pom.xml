@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.kloudtek.kryptotek</groupId>
             <artifactId>kryptotek-rest-client-httpcomponents</artifactId>
-            <version>1.0.4</version>
+            <version>${kryptotek-oss.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
