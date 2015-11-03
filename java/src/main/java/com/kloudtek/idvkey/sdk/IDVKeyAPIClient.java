@@ -115,15 +115,19 @@ public class IDVKeyAPIClient {
      */
     public URL linkUser(String serviceId, String redirectUrl, String userRef) throws IOException, UserAlreadyLinkedException {
         final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef));
-        req.setEntity(new StringEntity(redirectUrl));
-        final CloseableHttpResponse response = httpClient.execute(req);
-        final int retCode = response.getStatusLine().getStatusCode();
-        if (retCode == 409) {
-            throw new UserAlreadyLinkedException();
-        } else if (retCode < 200 || retCode > 299) {
-            throw new IOException("Server returned " + response.getStatusLine());
+        try {
+            req.setEntity(new StringEntity(redirectUrl));
+            final CloseableHttpResponse response = httpClient.execute(req);
+            final int retCode = response.getStatusLine().getStatusCode();
+            if (retCode == 409) {
+                throw new UserAlreadyLinkedException();
+            } else if (retCode < 200 || retCode > 299) {
+                throw new IOException("Server returned " + response.getStatusLine());
+            }
+            return new URL(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
+        } finally {
+            req.releaseConnection();
         }
-        return new URL(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
     }
 
     /**
@@ -135,7 +139,11 @@ public class IDVKeyAPIClient {
      */
     public void unlinkUser(String serviceId, String userRef) throws IOException, UserAlreadyLinkedException {
         final HttpDelete req = new HttpDelete(linkUserUrl(serviceId, userRef));
-        checkStatus(httpClient.execute(req));
+        try {
+            checkStatus(httpClient.execute(req));
+        } catch (IOException e) {
+            req.releaseConnection();
+        }
     }
 
     /**
@@ -149,14 +157,18 @@ public class IDVKeyAPIClient {
      */
     public boolean isUserLinked(String serviceId, String userRef) throws IOException {
         final HttpGet req = new HttpGet(linkUserUrl(serviceId, userRef));
-        final CloseableHttpResponse response = httpClient.execute(req);
-        final int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode == 404) {
-            return false;
-        } else if (statusCode == 200) {
-            return Boolean.parseBoolean(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
-        } else {
-            throw new IOException("Server returned " + response.getStatusLine());
+        try {
+            final CloseableHttpResponse response = httpClient.execute(req);
+            final int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 404) {
+                return false;
+            } else if (statusCode == 200) {
+                return Boolean.parseBoolean(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
+            } else {
+                throw new IOException("Server returned " + response.getStatusLine());
+            }
+        } finally {
+            req.releaseConnection();
         }
     }
 
@@ -237,19 +249,32 @@ public class IDVKeyAPIClient {
     }
 
     private CloseableHttpResponse get(String path) throws IOException {
-        return exec(new HttpGet(buildUrl(path)));
+        final HttpGet req = new HttpGet(buildUrl(path));
+        try {
+            return exec(req);
+        } finally {
+            req.releaseConnection();
+        }
     }
 
     private CloseableHttpResponse postJson(String path, Object obj) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
-        post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
-        return exec(post);
+        try {
+            post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
+            return exec(post);
+        } finally {
+            post.releaseConnection();
+        }
     }
 
     private CloseableHttpResponse post(String path, String string) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
-        post.setEntity(new StringEntity(string));
-        return exec(post);
+        try {
+            post.setEntity(new StringEntity(string));
+            return exec(post);
+        } finally {
+            post.releaseConnection();
+        }
     }
 
     private CloseableHttpResponse exec(HttpUriRequest req) throws IOException {
