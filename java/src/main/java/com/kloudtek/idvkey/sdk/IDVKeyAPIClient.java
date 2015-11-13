@@ -107,7 +107,7 @@ public class IDVKeyAPIClient {
      * Link an IDVKey user to your service/website.
      * You need to call this operation before a user on your website can use his IDVKey device
      *
-     * @param serviceId      Your website serviceId
+     * @param serviceId   Your website serviceId
      * @param redirectUrl The URL to which the user's browser will be redirected to after he's approved the link
      * @param userRef     User reference (generally the user's username on your website)
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
@@ -150,8 +150,8 @@ public class IDVKeyAPIClient {
      * Check if a user has been linked against your website.
      * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUser(String, String, String)}.
      *
-     * @param serviceId  Website serviceId
-     * @param userRef User reference (generally the user's username on your website)
+     * @param serviceId Website serviceId
+     * @param userRef   User reference (generally the user's username on your website)
      * @return true if the user is linked against your website
      * @throws IOException If error occurred performing the operation
      */
@@ -175,7 +175,7 @@ public class IDVKeyAPIClient {
     /**
      * Initiate an IDVKey authentication for a user
      *
-     * @param serviceId      Website serviceId
+     * @param serviceId   Website serviceId
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
      * @return Operation result. This will contain the URL you should redirect your user's browser to
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
@@ -183,8 +183,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl) throws IOException {
-        final CloseableHttpResponse response = post("api/idvkey/authenticate", serviceId);
-        final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+        final String opId = post("api/idvkey/authenticate", serviceId);
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
     }
 
@@ -196,14 +195,13 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public String confirmUserAuthentication(@NotNull String opId) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/authenticate?opId=" + urlEncode(opId));
-        return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+        return get("api/idvkey/authenticate?opId=" + urlEncode(opId));
     }
 
     /**
      * Request for a user to approve an operation using IDVKey
      *
-     * @param serviceId          serviceId
+     * @param serviceId       serviceId
      * @param userRef         User ref
      * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired)
      * @param approvalRequest Approval request details
@@ -219,8 +217,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final CloseableHttpResponse response = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId).add("userRef", userRef).toString(), approvalRequest);
-        final String opId = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+        final String opId = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId).add("userRef", userRef).toString(), approvalRequest);
         return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
 
@@ -232,8 +229,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final CloseableHttpResponse response = get("api/idvkey/approve?opId=" + urlEncode(opId));
-        final String state = StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+        final String state = get("api/idvkey/approve?opId=" + urlEncode(opId));
         try {
             return ApprovalState.valueOf(state);
         } catch (IllegalArgumentException e) {
@@ -248,39 +244,31 @@ public class IDVKeyAPIClient {
         }
     }
 
-    private CloseableHttpResponse get(String path) throws IOException {
+    private String get(String path) throws IOException {
         final HttpGet req = new HttpGet(buildUrl(path));
-        try {
-            return exec(req);
-        } finally {
-            req.releaseConnection();
-        }
+        return exec(req);
     }
 
-    private CloseableHttpResponse postJson(String path, Object obj) throws IOException {
+    private String postJson(String path, Object obj) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
-        try {
-            post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
-            return exec(post);
-        } finally {
-            post.releaseConnection();
-        }
+        post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
+        return exec(post);
     }
 
-    private CloseableHttpResponse post(String path, String string) throws IOException {
+    private String post(String path, String string) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
-        try {
-            post.setEntity(new StringEntity(string));
-            return exec(post);
-        } finally {
-            post.releaseConnection();
-        }
+        post.setEntity(new StringEntity(string));
+        return exec(post);
     }
 
-    private CloseableHttpResponse exec(HttpUriRequest req) throws IOException {
+    private String exec(HttpUriRequest req) throws IOException {
         final CloseableHttpResponse response = httpClient.execute(req);
-        checkStatus(response);
-        return response;
+        try {
+            checkStatus(response);
+            return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+        } finally {
+            response.close();
+        }
     }
 
     private URLBuilder url(String path) {
@@ -294,5 +282,4 @@ public class IDVKeyAPIClient {
     private URI linkUserUrl(String serviceId, String userRef) {
         return url("api/idvkey/linkuser").add("serviceId", serviceId).add("userRef", userRef).toUri();
     }
-
 }
