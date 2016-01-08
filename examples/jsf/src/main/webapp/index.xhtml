@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016 Kloudtek Ltd
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+>
+<h:body>
+    <div>
+        Please login or register a new user
+    </div>
+    <div style="margin-top: 10px">
+        <div>
+            Login
+        </div>
+        <div>
+            Username: <h:inputText value="#{login.username}"/>
+        </div>
+        <div>
+            Password: <h:inputSecret value="#{login.password}"/>
+        </div>
+        <div>
+            <h:commandButton value="Login" action="#{login.login}"/>
+        </div>
+        <div>
+            <h:messages/>
+        </div>
+    </div>
+    <div style="margin-top: 10px">
+        <h:link outcome="register">Register new user</h:link>
+    </div>
+</h:body>
+</html>
