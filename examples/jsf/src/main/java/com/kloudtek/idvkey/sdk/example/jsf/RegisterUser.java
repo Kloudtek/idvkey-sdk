@@ -20,6 +20,7 @@ public class RegisterUser {
     private UserDb userDb;
     private String username;
     private String password;
+    private String confirmPassword;
 
     public RegisterUser() {
     }
@@ -40,6 +41,14 @@ public class RegisterUser {
         this.password = password;
     }
 
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
     public UserDb getUserDb() {
         return userDb;
     }
@@ -49,11 +58,10 @@ public class RegisterUser {
     }
 
     public String register() {
-        final User user = userDb.findUser(username);
-        if (user != null && user.comparePassword(password)) {
-            return "loggedin.xhtml";
+        if( ! password.equals(confirmPassword) ) {
+            JSFUtils.addErrorMessage(null, "Passwords do not match");
+            return null;
         } else {
-            JSFUtils.addErrorMessage(null, "Invalid username / password");
             return null;
         }
     }
