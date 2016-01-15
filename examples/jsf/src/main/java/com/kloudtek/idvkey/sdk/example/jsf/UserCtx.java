@@ -5,11 +5,13 @@ import com.kloudtek.idvkey.sdk.UserAlreadyLinkedException;
 import com.kloudtek.kryptotek.CryptoUtils;
 import com.kloudtek.kryptotek.DigestAlgorithm;
 import com.kloudtek.kryptotek.key.HMACKey;
+import com.kloudtek.util.JSFUtils;
 import com.kloudtek.util.StringUtils;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.IOException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 
 /**
@@ -48,6 +50,7 @@ public class UserCtx {
     }
 
     public void linkUser() throws IOException, UserAlreadyLinkedException {
-        apiClient.linkUser(websiteId,"http://localhost:8080",user.getUsername());
+        final URL url = apiClient.linkUser(websiteId, JSFUtils.getContextURL("/loggedin.xhtml"), user.getUsername());
+        JSFUtils.getExternalContext().redirect(url.toString());
     }
 }

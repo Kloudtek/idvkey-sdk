@@ -26,15 +26,14 @@
         </div>
         <div id="page">
             <div id="content">
-                <div id="banner"><img src="images/img07.jpg" alt="" /></div>
-                <h:form>
-                    <p:commandButton value="Link User to IDVKey" rendered="#{not userCtx.linked}" actionListener="#{userCtx.linkUser}"/>
-                </h:form>
-                <div class="post">
-                    <h2 class="title"><a href="#">Lorem ipsum dolor sit amet </a></h2>
-                    <p class="meta">Aliquam sit amet tempus sed consequat</p>
+                <div>
+                    IDVKey has now been enabled for this website
                 </div>
-                <div style="clear: both;">&nbsp;</div>
+                <div>
+                    <h:form>
+                        <h:commandButton value="Continue" action="/loggedin"/>
+                    </h:form>
+                </div>
             </div>
             <!-- end #content -->
             <div id="sidebar">

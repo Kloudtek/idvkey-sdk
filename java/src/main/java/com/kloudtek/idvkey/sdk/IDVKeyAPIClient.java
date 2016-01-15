@@ -66,7 +66,7 @@ public class IDVKeyAPIClient {
     }
 
     public IDVKeyAPIClient(String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
-        this("https://www.idvkey.com", keyId, signingKey, signatureVerificationKey, timeout);
+        this("https://portal.idvkey.com", keyId, signingKey, signatureVerificationKey, timeout);
     }
 
     public IDVKeyAPIClient(String serverUrl, String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
