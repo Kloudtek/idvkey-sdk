@@ -6,7 +6,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://java.sun.com/jsf/html"
 >
 <h:head>
     <title>Example IDVKey integration website</title>
@@ -27,6 +27,9 @@
         <div id="page">
             <div id="content">
                 <div id="banner"><img src="images/img07.jpg" alt="" /></div>
+                <h:form>
+                    <p:commandButton value="Link User to IDVKey" rendered="#{not userCtx.linked}"/>
+                </h:form>
                 <div class="post">
                     <h2 class="title"><a href="#">Lorem ipsum dolor sit amet </a></h2>
                     <p class="meta">Aliquam sit amet tempus sed consequat</p>

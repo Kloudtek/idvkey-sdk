@@ -47,12 +47,11 @@ public class IDVKeyAPIClient {
 
     /**
      * Constructor
-     *
-     * @param id  Key id
+     *  @param keyId  Key id
      * @param key A {@link SignAndVerifyKey} key
      */
-    public IDVKeyAPIClient(String id, SignAndVerifyKey key) {
-        this(id, key, key, DEFAULT_TIMEOUT);
+    public IDVKeyAPIClient(String keyId, SignAndVerifyKey key) {
+        this(keyId, key, key, DEFAULT_TIMEOUT);
     }
 
     /**
@@ -66,11 +65,11 @@ public class IDVKeyAPIClient {
         this(serverUrl, id, key, key, DEFAULT_TIMEOUT);
     }
 
-    public IDVKeyAPIClient(String id, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
-        this("https://www.idvkey.com", id, signingKey, signatureVerificationKey, timeout);
+    public IDVKeyAPIClient(String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
+        this("https://www.idvkey.com", keyId, signingKey, signatureVerificationKey, timeout);
     }
 
-    public IDVKeyAPIClient(String serverUrl, String id, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
+    public IDVKeyAPIClient(String serverUrl, String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
         this.serverUrl = serverUrl;
         // Create HTTP Client with REST security interceptor
         final HCInterceptor hcInterceptor = new HCInterceptor(new JCECryptoEngine(), null);
@@ -81,7 +80,7 @@ public class IDVKeyAPIClient {
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         // This is used to used to adjust http timestamps in case client has the wrong time
         final TimeAsHttpContentTimeSync timeSync = new TimeAsHttpContentTimeSync(new URLBuilder(serverUrl).addPath("/public/time").toString());
-        credentialsProvider.setCredentials(ANY, new RestAuthCredential(id, signingKey, signatureVerificationKey,
+        credentialsProvider.setCredentials(ANY, new RestAuthCredential(keyId, signingKey, signatureVerificationKey,
                 DigestAlgorithm.SHA256, timeSync));
         httpClient = httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider).build();
     }

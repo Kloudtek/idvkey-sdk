@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class User implements Serializable {
     private String username;
     private String password;
+    private boolean idvkeyLinked;
 
     public User(String username, String password) {
         this.username = username;
@@ -24,5 +25,13 @@ public class User implements Serializable {
 
     public boolean comparePassword(String password) {
         return this.password.equals(password);
+    }
+
+    public boolean isIdvkeyLinked() {
+        return idvkeyLinked;
+    }
+
+    public void setIdvkeyLinked(boolean idvkeyLinked) {
+        this.idvkeyLinked = idvkeyLinked;
     }
 }

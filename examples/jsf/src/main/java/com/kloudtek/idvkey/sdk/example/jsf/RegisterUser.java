@@ -18,6 +18,8 @@ import javax.faces.bean.RequestScoped;
 public class RegisterUser {
     @ManagedProperty("#{userDb}")
     private UserDb userDb;
+    @ManagedProperty("#{userCtx}")
+    private UserCtx userCtx;
     private String username;
     private String password;
     private String confirmPassword;
@@ -57,12 +59,22 @@ public class RegisterUser {
         this.userDb = userDb;
     }
 
+    public UserCtx getUserCtx() {
+        return userCtx;
+    }
+
+    public void setUserCtx(UserCtx userCtx) {
+        this.userCtx = userCtx;
+    }
+
     public String register() {
         if( ! password.equals(confirmPassword) ) {
             JSFUtils.addErrorMessage(null, "Passwords do not match");
             return null;
         } else {
-            return null;
+            final User user = userDb.createUser(username, password);
+            userCtx.setUser(user);
+            return "loggedin";
         }
     }
 }

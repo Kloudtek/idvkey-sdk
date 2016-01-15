@@ -39,8 +39,8 @@ public class APIKeyBundle implements Serializable {
 
     @JsonIgnore
     public HMACKey getHMACKey() throws InvalidKeyException {
-        if (type != Type.HMAC) {
-            throw new IllegalArgumentException("Key is not an HMAC Key: " + type.name());
+        if (type != Type.HMAC256) {
+            throw new IllegalArgumentException("Key is not an HMAC256 Key: " + type.name());
         }
         return CryptoUtils.readHMACKey(DigestAlgorithm.SHA256, StringUtils.base64Decode(value));
     }
@@ -78,6 +78,6 @@ public class APIKeyBundle implements Serializable {
     }
 
     public enum Type {
-        HMAC, RSA
+        HMAC256, RSA
     }
 }

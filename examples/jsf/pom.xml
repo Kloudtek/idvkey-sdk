@@ -32,5 +32,10 @@
             <artifactId>primefaces</artifactId>
             <version>5.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.kloudtek.idvkey.sdk</groupId>
+            <artifactId>idvkey-sdk-java</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
