@@ -4,15 +4,14 @@
 
 package com.kloudtek.idvkey.sdk.example.jsf;
 
-import javax.faces.bean.ApplicationScoped;
-import javax.faces.bean.ManagedBean;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 
 /**
  * Created by yannick on 1/8/16.
  */
-@ManagedBean
-@ApplicationScoped
+@Component
 public class UserDb {
     private HashMap<String, User> users = new HashMap<String, User>();
 

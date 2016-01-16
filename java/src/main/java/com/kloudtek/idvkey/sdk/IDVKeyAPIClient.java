@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Kloudtek Ltd
+ * Copyright (c) 2016 Kloudtek Ltd
  */
 
 package com.kloudtek.idvkey.sdk;
@@ -7,9 +7,12 @@ package com.kloudtek.idvkey.sdk;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kloudtek.idvkey.api.ApprovalRequest;
 import com.kloudtek.idvkey.api.ApprovalState;
+import com.kloudtek.idvkey.api.KeyType;
 import com.kloudtek.idvkey.api.OperationResult;
+import com.kloudtek.kryptotek.CryptoUtils;
 import com.kloudtek.kryptotek.DigestAlgorithm;
 import com.kloudtek.kryptotek.jce.JCECryptoEngine;
+import com.kloudtek.kryptotek.key.HMACKey;
 import com.kloudtek.kryptotek.key.SignAndVerifyKey;
 import com.kloudtek.kryptotek.key.SignatureVerificationKey;
 import com.kloudtek.kryptotek.key.SigningKey;
@@ -32,7 +35,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.security.InvalidKeyException;
 
+import static com.kloudtek.util.StringUtils.base64Decode;
 import static com.kloudtek.util.StringUtils.urlEncode;
 import static org.apache.http.auth.AuthScope.ANY;
 
@@ -41,14 +46,40 @@ import static org.apache.http.auth.AuthScope.ANY;
  */
 public class IDVKeyAPIClient {
     public static final int DEFAULT_TIMEOUT = 30000;
+    public static final String IDVKEY_URL = "https://portal.idvkey.com";
     protected CloseableHttpClient httpClient;
     protected String serverUrl;
     private static final ObjectMapper jsonMapper = new ObjectMapper();
 
     /**
      * Constructor
-     *  @param keyId  Key id
-     * @param key A {@link SignAndVerifyKey} key
+     *
+     * @param keyId     Key id
+     * @param base64Key A {@link SignAndVerifyKey} key
+     */
+    public IDVKeyAPIClient(String keyId, KeyType keyType, String base64Key) throws InvalidKeyException {
+        this(keyId, keyType, base64Decode(base64Key));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param keyId   Key id
+     * @param keyData A {@link SignAndVerifyKey} key
+     */
+    public IDVKeyAPIClient(String keyId, KeyType keyType, byte[] keyData) throws InvalidKeyException {
+        if (keyType != KeyType.HMAC_SHA256) {
+            throw new IllegalArgumentException("This constructor only support HMAC SHA-256 at this time");
+        }
+        final HMACKey key = CryptoUtils.readHMACKey(DigestAlgorithm.SHA256, keyData);
+        init(IDVKEY_URL, keyId, key, key, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param keyId Key id
+     * @param key   A {@link SignAndVerifyKey} key
      */
     public IDVKeyAPIClient(String keyId, SignAndVerifyKey key) {
         this(keyId, key, key, DEFAULT_TIMEOUT);
@@ -66,10 +97,14 @@ public class IDVKeyAPIClient {
     }
 
     public IDVKeyAPIClient(String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
-        this("https://portal.idvkey.com", keyId, signingKey, signatureVerificationKey, timeout);
+        this(IDVKEY_URL, keyId, signingKey, signatureVerificationKey, timeout);
     }
 
     public IDVKeyAPIClient(String serverUrl, String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
+        init(serverUrl, keyId, signingKey, signatureVerificationKey, timeout);
+    }
+
+    private void init(String serverUrl, String keyId, SigningKey signingKey, SignatureVerificationKey signatureVerificationKey, int timeout) {
         this.serverUrl = serverUrl;
         // Create HTTP Client with REST security interceptor
         final HCInterceptor hcInterceptor = new HCInterceptor(new JCECryptoEngine(), null);
@@ -109,13 +144,13 @@ public class IDVKeyAPIClient {
      * @param serviceId   Your website serviceId
      * @param redirectUrl The URL to which the user's browser will be redirected to after he's approved the link
      * @param userRef     User reference (generally the user's username on your website)
+     * @param cancelUrl   URL to redirect user to should he wish to cancel the linking
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException If the server returned an error
      */
-    public URL linkUser(String serviceId, String redirectUrl, String userRef) throws IOException, UserAlreadyLinkedException {
-        final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef));
+    public URL linkUser(String serviceId, URL redirectUrl, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException {
+        final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef, redirectUrl, cancelUrl));
         try {
-            req.setEntity(new StringEntity(redirectUrl));
             final CloseableHttpResponse response = httpClient.execute(req);
             final int retCode = response.getStatusLine().getStatusCode();
             if (retCode == 409) {
@@ -136,7 +171,7 @@ public class IDVKeyAPIClient {
      * @param userRef   User reference (generally the user's username on your website)
      * @throws IOException If the server returned an error
      */
-    public void unlinkUser(String serviceId, String userRef) throws IOException, UserAlreadyLinkedException {
+    public void unlinkUser(String serviceId, String userRef) throws IOException {
         final HttpDelete req = new HttpDelete(linkUserUrl(serviceId, userRef));
         try {
             checkStatus(httpClient.execute(req));
@@ -147,7 +182,8 @@ public class IDVKeyAPIClient {
 
     /**
      * Check if a user has been linked against your website.
-     * You should call this the user's browser has been redirected to the redirectUrl you specified in {@link #linkUser(String, String, String)}.
+     * Use this to verify the user has been successfully linked to your website/service after he's been redirected to
+     * the redirectUrl you specified in {@link #linkUser(String, URL, String, URL)}.
      *
      * @param serviceId Website serviceId
      * @param userRef   User reference (generally the user's username on your website)
@@ -279,6 +315,14 @@ public class IDVKeyAPIClient {
     }
 
     private URI linkUserUrl(String serviceId, String userRef) {
-        return url("api/idvkey/linkuser").add("serviceId", serviceId).add("userRef", userRef).toUri();
+        return linkUrlUrlBuilder(serviceId, userRef).toUri();
+    }
+
+    private URI linkUserUrl(String serviceId, String userRef, URL redirectUrl, URL cancelUrl) {
+        return linkUrlUrlBuilder(serviceId, userRef).add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).toUri();
+    }
+
+    private URLBuilder linkUrlUrlBuilder(String serviceId, String userRef) {
+        return url("api/idvkey/linkuser").add("serviceId", serviceId).add("userRef", userRef);
     }
 }

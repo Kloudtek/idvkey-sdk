@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Kloudtek Ltd
+ * Copyright (c) 2016 Kloudtek Ltd
  */
 
 package com.kloudtek.idvkey.api;
@@ -19,13 +19,14 @@ public interface IDVKeyAPIService {
      * @param serviceId       Website service id
      * @param userRef         User reference that will represent this user within the specified service/website
      * @param redirectUrl     URL to redirect to after user approval is completed
+     * @param cancelUrl
      * @param securityContext AJAX security context  @return Operation Id
      */
     @POST
     @Path("linkuser")
     @AuthenticateCustomer
     String linkUserToCustomerService(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
-                                     String redirectUrl, @Context SecurityContext securityContext);
+                                     @QueryParam("redirectUrl") String redirectUrl, @QueryParam("cancelUrl") String cancelUrl, @Context SecurityContext securityContext);
 
     @GET
     @Path("linkuser")

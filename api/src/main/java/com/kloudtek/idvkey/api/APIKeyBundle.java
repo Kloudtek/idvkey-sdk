@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Kloudtek Ltd
+ * Copyright (c) 2016 Kloudtek Ltd
  */
 
 package com.kloudtek.idvkey.api;
@@ -23,14 +23,14 @@ public class APIKeyBundle implements Serializable {
     @JsonProperty("alias")
     private String alias;
     @JsonProperty("type")
-    private Type type;
+    private KeyType type;
     @JsonProperty("value")
     private String value;
 
     public APIKeyBundle() {
     }
 
-    public APIKeyBundle(String id, String alias, Type type, String value) {
+    public APIKeyBundle(String id, String alias, KeyType type, String value) {
         this.id = id;
         this.alias = alias;
         this.type = type;
@@ -39,8 +39,8 @@ public class APIKeyBundle implements Serializable {
 
     @JsonIgnore
     public HMACKey getHMACKey() throws InvalidKeyException {
-        if (type != Type.HMAC256) {
-            throw new IllegalArgumentException("Key is not an HMAC256 Key: " + type.name());
+        if (type != KeyType.HMAC_SHA256) {
+            throw new IllegalArgumentException("Key is not an HMAC_SHA256 Key: " + type.name());
         }
         return CryptoUtils.readHMACKey(DigestAlgorithm.SHA256, StringUtils.base64Decode(value));
     }
@@ -61,11 +61,11 @@ public class APIKeyBundle implements Serializable {
         this.alias = alias;
     }
 
-    public Type getType() {
+    public KeyType getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(KeyType type) {
         this.type = type;
     }
 
@@ -75,9 +75,5 @@ public class APIKeyBundle implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public enum Type {
-        HMAC256, RSA
     }
 }

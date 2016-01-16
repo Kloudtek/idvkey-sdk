@@ -1,4 +1,8 @@
 /*
+ * Copyright (c) 2016 Kloudtek Ltd
+ */
+
+/*
 Design by Free CSS Templates
 http://www.freecsstemplates.org
 Released for free under a Creative Commons Attribution 2.5 License
@@ -449,4 +453,8 @@ h2 a {
 #footer a {
 	text-decoration: underline;
 	color: #82A2B9;
+}
+
+.loginwith {
+	text-decoration: none;
 }

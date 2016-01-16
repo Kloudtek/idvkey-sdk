@@ -1,40 +1,40 @@
+/*
+ * Copyright (c) 2016 Kloudtek Ltd
+ */
+
 package com.kloudtek.idvkey.sdk.example.jsf;
 
 import com.kloudtek.idvkey.sdk.IDVKeyAPIClient;
 import com.kloudtek.idvkey.sdk.UserAlreadyLinkedException;
-import com.kloudtek.kryptotek.CryptoUtils;
-import com.kloudtek.kryptotek.DigestAlgorithm;
-import com.kloudtek.kryptotek.key.HMACKey;
 import com.kloudtek.util.JSFUtils;
-import com.kloudtek.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
 import java.io.IOException;
 import java.net.URL;
 import java.security.InvalidKeyException;
+import java.util.logging.Logger;
 
 /**
  * Created by yannick on 1/14/16.
  */
-@ManagedBean
-@SessionScoped
+@Component
+@Scope("session")
 public class UserCtx {
+    private static final Logger logger = Logger.getLogger(UserCtx.class.getName());
     private User user;
-    private transient final IDVKeyAPIClient apiClient;
-    private transient final String websiteId;
+    private String authOpId;
+    @Autowired
+    private transient IDVKeyAPIClient apiClient;
+    @Value("${websiteId}")
+    private transient String websiteId;
+    private transient String linkedUserRef;
+    @Value("${unlinkLinked}")
+    private transient boolean unlinkIfAlreadyLinked;
 
     public UserCtx() throws InvalidKeyException {
-        final String keyId = System.getProperty("keyid");
-        final String apiKey = System.getProperty("key");
-        websiteId = System.getProperty("websiteId");
-        if(StringUtils.isBlank(apiKey)) {
-            throw new IllegalStateException("keyid system property not set");
-        } else if(StringUtils.isBlank(apiKey)) {
-            throw new IllegalStateException("key system property not set");
-        }
-        final HMACKey hmacKey = CryptoUtils.readHMACKey(DigestAlgorithm.SHA256, StringUtils.base64Decode(apiKey));
-        apiClient = new IDVKeyAPIClient(keyId, hmacKey);
     }
 
     public User getUser() {
@@ -45,12 +45,45 @@ public class UserCtx {
         this.user = user;
     }
 
+    public String getWebsiteId() {
+        return websiteId;
+    }
+
+    public String getLinkedUserRef() {
+        return linkedUserRef;
+    }
+
+    public void setLinkedUserRef(String linkedUserRef) {
+        this.linkedUserRef = linkedUserRef;
+    }
+
     public boolean isLinked() throws IOException {
         return user != null && user.isIdvkeyLinked();
     }
 
-    public void linkUser() throws IOException, UserAlreadyLinkedException {
-        final URL url = apiClient.linkUser(websiteId, JSFUtils.getContextURL("/loggedin.xhtml"), user.getUsername());
+    public void linkUser() throws IOException {
+        final URL url;
+        try {
+            url = apiClient.linkUser(websiteId, JSFUtils.getContextURL("/linked.xhtml"), user.getUsername(), cancelUrl);
+        } catch (UserAlreadyLinkedException e) {
+            logger.warning("User " + user.getUsername() + " was already linked");
+            if (unlinkIfAlreadyLinked) {
+                // Note: You wouldn't normally do this in your own code, this is here just for debugging/testing purposes
+                apiClient.unlinkUser(websiteId, user.getUsername());
+                linkUser();
+            } else {
+                JSFUtils.getExternalContext().redirect("linked.xhtml?userRef=" + user.getUsername());
+            }
+            return;
+        }
         JSFUtils.getExternalContext().redirect(url.toString());
     }
+
+    public void verifyLink() {
+        if (!linkedUserRef.equals(user.getUsername())) {
+            throw new IllegalStateException("userRef does not match currently logged in user");
+        }
+        user.setIdvkeyLinked(true);
+    }
+
 }
