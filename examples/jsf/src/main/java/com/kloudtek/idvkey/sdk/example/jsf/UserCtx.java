@@ -64,7 +64,8 @@ public class UserCtx {
     public void linkUser() throws IOException {
         final URL url;
         try {
-            url = apiClient.linkUser(websiteId, JSFUtils.getContextURL("/linked.xhtml"), user.getUsername(), cancelUrl);
+            url = apiClient.linkUser(websiteId, new URL(JSFUtils.getContextURL("/linked.xhtml")), user.getUsername(),
+                    new URL(JSFUtils.getContextURL("/loggedin.xhtml")));
         } catch (UserAlreadyLinkedException e) {
             logger.warning("User " + user.getUsername() + " was already linked");
             if (unlinkIfAlreadyLinked) {
