@@ -24,7 +24,6 @@ import java.io.Serializable;
 @Controller("idvkeyAuth")
 @Scope("session")
 public class IDVKeyLogin implements Serializable {
-    public static final String VERIFYAUTH = "/verifyauth";
     @Autowired
     private transient IDVKeyAPIClient apiClient;
     @Autowired
@@ -36,14 +35,15 @@ public class IDVKeyLogin implements Serializable {
     private String authOpId;
 
     public void login() throws IOException {
-        final OperationResult operationResult = apiClient.authenticateUser(websiteId, JSFUtils.getContextURL(VERIFYAUTH));
-        // since this bean is session scoped, this will be available later in the verify call
+        final OperationResult operationResult = apiClient.authenticateUser(websiteId, JSFUtils.getContextURL("/rest/verifyauth"));
+        // since this bean is session scoped, this will be available later in the verifyAuth call below
         authOpId = operationResult.getOpId();
         JSFUtils.getExternalContext().redirect(operationResult.getRedirectUrl().toString());
     }
 
-    @RequestMapping(VERIFYAUTH)
+    @RequestMapping("/verifyauth")
     public ModelAndView verifyAuth(ModelMap model) throws IOException {
+        // let's verify the user has authenticated successfully before setting him/her as authenticated.
         final String username = apiClient.confirmUserAuthentication(authOpId);
         userCtx.setUser(userDb.findUser(username));
         model.addAttribute("attribute", "redirectWithRedirectPrefix");
