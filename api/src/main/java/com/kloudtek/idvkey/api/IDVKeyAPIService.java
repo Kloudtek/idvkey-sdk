@@ -19,7 +19,7 @@ public interface IDVKeyAPIService {
      * @param serviceId       Website service id
      * @param userRef         User reference that will represent this user within the specified service/website
      * @param redirectUrl     URL to redirect to after user approval is completed
-     * @param cancelUrl
+     * @param cancelUrl       URL to redirect to if the user wants to cancel the operation
      * @param securityContext AJAX security context  @return Operation Id
      */
     @POST
@@ -61,9 +61,10 @@ public interface IDVKeyAPIService {
     @Path("approve")
     @AuthenticateCustomer
     @Consumes("application/json")
-    @Produces("text/plain")
-    String requestApproval(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
-                           ApprovalRequest req, @Context SecurityContext securityContext);
+    @Produces("application/json")
+    OperationResult requestApproval(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
+                                    @QueryParam("redirectUrl") String redirectUrl, @QueryParam("cancelUrl") String cancelUrl,
+                                    ApprovalRequest req, @Context SecurityContext securityContext);
 
     @GET
     @Path("approve")

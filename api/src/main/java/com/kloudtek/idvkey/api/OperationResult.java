@@ -1,8 +1,10 @@
 /*
- * Copyright (c) 2015 Kloudtek Ltd
+ * Copyright (c) 2016 Kloudtek Ltd
  */
 
 package com.kloudtek.idvkey.api;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URL;
 
@@ -10,8 +12,13 @@ import java.net.URL;
  * Operation result, which is returned by IDVKey when you request any kind of user authentication operation.
  */
 public class OperationResult {
+    @JsonProperty
     private String opId;
+    @JsonProperty
     private URL redirectUrl;
+
+    public OperationResult() {
+    }
 
     public OperationResult(String opId, URL redirectUrl) {
         this.opId = opId;
@@ -27,6 +34,10 @@ public class OperationResult {
         return opId;
     }
 
+    public void setOpId(String opId) {
+        this.opId = opId;
+    }
+
     /**
      * URL that you should redirect your user to
      *
@@ -34,5 +45,9 @@ public class OperationResult {
      */
     public URL getRedirectUrl() {
         return redirectUrl;
+    }
+
+    public void setRedirectUrl(URL redirectUrl) {
+        this.redirectUrl = redirectUrl;
     }
 }

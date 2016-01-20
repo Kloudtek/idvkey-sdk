@@ -219,7 +219,7 @@ public class IDVKeyAPIClient {
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl) throws IOException {
         final String opId = post("api/idvkey/authenticate", serviceId);
-        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("/authenticate").add("opId", opId).add("url", redirectUrl).toUrl());
+        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
     }
 
     /**
@@ -239,12 +239,13 @@ public class IDVKeyAPIClient {
      * @param serviceId       serviceId
      * @param userRef         User ref
      * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired)
-     * @param approvalRequest Approval request details
-     * @return Operation results
+     * @param cancelUrl
+     *@param approvalRequest Approval request details  @return Operation results
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
-    public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull String redirectUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
+    public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull String redirectUrl,
+                                           @NotNull String cancelUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
         if (approvalRequest == null) {
             throw new IllegalArgumentException("approval request missing");
         } else if (StringUtils.isBlank(approvalRequest.getTitle())) {
@@ -252,8 +253,9 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final String opId = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId).add("userRef", userRef).toString(), approvalRequest);
-        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
+        final String json = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId)
+                .add("redirectUrl", redirectUrl).add("cancelUrl", cancelUrl).add("userRef", userRef).toString(), approvalRequest);
+        return jsonMapper.readValue(json, OperationResult.class);
     }
 
     /**
