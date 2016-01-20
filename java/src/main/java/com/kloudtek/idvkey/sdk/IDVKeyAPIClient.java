@@ -212,20 +212,22 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId   Website serviceId
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
+     * @param cancelUrl
      * @return Operation result. This will contain the URL you should redirect your user's browser to
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException If error occurred performing the operation
      */
-    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl) throws IOException {
-        final String opId = post("api/idvkey/authenticate", serviceId);
-        return new OperationResult(opId, new URLBuilder(serverUrl).addPath("public/operation.xhtml").add("opId", opId).add("url", redirectUrl).toUrl());
+    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl, String cancelUrl) throws IOException {
+        String url = new URLBuilder("api/idvkey/authenticate").add("serviceId", serviceId).add("redirectUrl", redirectUrl).add("cancelUrl", cancelUrl).toString();
+        final String jsonOpRes = post(url, null);
+        return jsonMapper.readValue(jsonOpRes, OperationResult.class);
     }
 
     /**
      * Confirm that user Authentication was done successfully
      *
-     * @param opId Operation id returned by {@link #authenticateUser(String, String)}
+     * @param opId Operation id returned by {@link #authenticateUser(String, String, String)}
      * @return Authenticated user ref
      * @throws IOException If error occurred performing the operation
      */
@@ -238,9 +240,9 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId       serviceId
      * @param userRef         User ref
-     * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired)
-     * @param cancelUrl
-     *@param approvalRequest Approval request details  @return Operation results
+     * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired).
+     * @param cancelUrl       URL to redirect browser if the user wants to cancel the operation.
+     * @param approvalRequest Approval request details  @return Operation results
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
@@ -294,7 +296,9 @@ public class IDVKeyAPIClient {
 
     private String post(String path, String string) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
-        post.setEntity(new StringEntity(string));
+        if (string != null) {
+            post.setEntity(new StringEntity(string));
+        }
         return exec(post);
     }
 

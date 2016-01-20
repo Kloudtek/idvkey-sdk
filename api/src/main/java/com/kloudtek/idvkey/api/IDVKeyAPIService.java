@@ -44,7 +44,9 @@ public interface IDVKeyAPIService {
     @POST
     @Path("authenticate")
     @AuthenticateCustomer
-    String requestUserAuthentication(String serviceId, @Context SecurityContext securityContext);
+    @Produces("application/json")
+    OperationResult requestUserAuthentication(@QueryParam("serviceId") String serviceId, @QueryParam("redirectUrl") String redirectUrl,
+                                              @QueryParam("cancelUrl") String cancelUrl, @Context SecurityContext securityContext);
 
     /**
      * Get the user ref for the user authenticated with that operation id
