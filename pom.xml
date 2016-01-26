@@ -38,7 +38,7 @@
     <properties>
         <repo.oss.snapshot.url/>
         <repo.oss.release.url/>
-        <kryptotek-oss.version>1.0.4</kryptotek-oss.version>
+        <kryptotek-oss.version>1.0.7</kryptotek-oss.version>
     </properties>
     <licenses>
         <license>
