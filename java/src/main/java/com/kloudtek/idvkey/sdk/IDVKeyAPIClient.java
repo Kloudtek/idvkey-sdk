@@ -212,14 +212,14 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId   Website serviceId
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
-     * @param cancelUrl
-     * @return Operation result. This will contain the URL you should redirect your user's browser to
+     * @param cancelUrl URL that the user's browser should be redirected to if he cancelled the authentication.
+     * @return Operation result. This will contain the URL you should redirect your user's browser to.
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException If error occurred performing the operation
      */
-    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull String redirectUrl, String cancelUrl) throws IOException {
-        String url = new URLBuilder("api/idvkey/authenticate").add("serviceId", serviceId).add("redirectUrl", redirectUrl).add("cancelUrl", cancelUrl).toString();
+    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl) throws IOException {
+        String url = new URLBuilder("api/idvkey/authenticate").add("serviceId", serviceId).add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).toString();
         final String jsonOpRes = post(url, null);
         return jsonMapper.readValue(jsonOpRes, OperationResult.class);
     }
@@ -227,7 +227,7 @@ public class IDVKeyAPIClient {
     /**
      * Confirm that user Authentication was done successfully
      *
-     * @param opId Operation id returned by {@link #authenticateUser(String, String, String)}
+     * @param opId Operation id returned by {@link #authenticateUser(String, URL, URL)}
      * @return Authenticated user ref
      * @throws IOException If error occurred performing the operation
      */
@@ -246,8 +246,8 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
-    public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull String redirectUrl,
-                                           @NotNull String cancelUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
+    public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull URL redirectUrl,
+                                           @NotNull URL cancelUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
         if (approvalRequest == null) {
             throw new IllegalArgumentException("approval request missing");
         } else if (StringUtils.isBlank(approvalRequest.getTitle())) {
@@ -256,7 +256,7 @@ public class IDVKeyAPIClient {
             throw new IllegalArgumentException("approval text missing");
         }
         final String json = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId)
-                .add("redirectUrl", redirectUrl).add("cancelUrl", cancelUrl).add("userRef", userRef).toString(), approvalRequest);
+                .add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).add("userRef", userRef).toString(), approvalRequest);
         return jsonMapper.readValue(json, OperationResult.class);
     }
 

@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 
 /**
  * Created by yannick on 1/15/16.
@@ -35,7 +36,8 @@ public class IDVKeyLogin implements Serializable {
     private String authOpId;
 
     public void login() throws IOException {
-        final OperationResult operationResult = apiClient.authenticateUser(websiteId, JSFUtils.getContextURL("/rest/verifyauth"), JSFUtils.getContextURL("/index.xhtml"));
+        final OperationResult operationResult = apiClient.authenticateUser(websiteId,
+                new URL(JSFUtils.getContextURL("/rest/verifyauth")), new URL(JSFUtils.getContextURL("/index.xhtml")));
         // since this bean is session scoped, this will be available later in the verifyAuth call below
         authOpId = operationResult.getOpId();
         JSFUtils.getExternalContext().redirect(operationResult.getRedirectUrl().toString());

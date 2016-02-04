@@ -6,11 +6,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
 >
 <h:head>
     <title>Example IDVKey integration website</title>
     <h:outputStylesheet library="css" name="style.css"/>
+    <f:metadata>
+        <f:viewParam name="opId" value="#{requestTask.opId}"/>
+        <f:viewAction action="#{requestTask.complete}"/>
+    </f:metadata>
 </h:head>
 <h:body>
     <div id="wrapper">
@@ -27,22 +31,13 @@
         </div>
         <div id="page">
             <div id="content">
-                <div id="banner"><img src="images/img07.jpg" alt="" /></div>
-                <h:form>
-                    <p:commandButton value="Link User to IDVKey" rendered="#{not userCtx.linked}"
-                                     actionListener="#{userCtx.linkUser}" ajax="false"/>
-                </h:form>
-                <h:form rendered="#{userCtx.linked}">
-                    <p:fieldset legend="Request task to be executed">
-                        <div>
-                            <p:watermark for="taskdetails" value="Task details"/>
-                            <p:inputText id="taskdetails" value="#{requestTask.details}"/>
-                        </div>
-                        <div class="martop">
-                            <p:commandButton value="Submit" actionListener="#{requestTask.submit}" ajax="false"/>
-                        </div>
-                    </p:fieldset>
-                </h:form>
+                <div>
+                    Task "<span style="font-weight: bold"><h:outputText
+                        value="#{requestTask.details}"/></span>" has been scheduled for execution.
+                </div>
+                <div class="martop">
+                    <p:link value="back" outcome="/index"/>
+                </div>
                 <div style="clear: both;">&nbsp;</div>
             </div>
             <!-- end #content -->
@@ -50,7 +45,9 @@
                 <ul>
                     <li>
                         <h2>Veroeros sit dolore</h2>
-                        <p><strong>Donec turpis orci</strong> facilisis et ornare eget, sagittis eu massa. Quisque dui diam, euismod et lobortis sed etiam lorem ipsum dolor etiam nullam et faucibus. <a href="#">More&#8230;</a></p>
+                        <p>
+                            <strong>Donec turpis orci</strong> facilisis et ornare eget, sagittis eu massa. Quisque dui diam, euismod et lobortis sed etiam lorem ipsum dolor etiam nullam et faucibus.
+                            <a href="#">More&#8230;</a></p>
                     </li>
                     <li>
                         <h2>Categories</h2>
@@ -75,7 +72,9 @@
     <div id="footer-content">
         <div class="column1">
             <h2>Volutpat quisque sed et aliquam</h2>
-            <p><strong>Maecenas ut ante</strong> eu velit laoreet tempor accumsan vitae nibh. Aenean commodo, tortor eu porta convolutpat elementum. Proin fermentum molestie erat eget vehicula. Aenean eget tellus mi. Fusce scelerisque odio quis ante bibendum sollicitudin. Suspendisse potenti. Vivamus quam odio, facilisis at ultrices nec, sollicitudin ac risus. Donec ut odio ipsum, sed tincidunt. <a href="#">Learn more&#8230;</a></p>
+            <p>
+                <strong>Maecenas ut ante</strong> eu velit laoreet tempor accumsan vitae nibh. Aenean commodo, tortor eu porta convolutpat elementum. Proin fermentum molestie erat eget vehicula. Aenean eget tellus mi. Fusce scelerisque odio quis ante bibendum sollicitudin. Suspendisse potenti. Vivamus quam odio, facilisis at ultrices nec, sollicitudin ac risus. Donec ut odio ipsum, sed tincidunt.
+                <a href="#">Learn more&#8230;</a></p>
         </div>
         <div class="column2">
             <ul class="list">
@@ -88,7 +87,8 @@
         </div>
     </div>
     <div id="footer">
-        <p> (c) 2015 Kloudtek. Design by <a href="http://www.nodethirtythree.com">nodethirtythree</a> and <a href="http://www.freecsstemplates.org">Free CSS Templates</a>.</p>
+        <p> (c) 2015 Kloudtek. Design by <a href="http://www.nodethirtythree.com">nodethirtythree</a> and <a
+                href="http://www.freecsstemplates.org">Free CSS Templates</a>.</p>
     </div>
 </h:body>
 </html>
