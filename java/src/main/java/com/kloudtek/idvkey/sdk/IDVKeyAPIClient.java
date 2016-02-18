@@ -279,22 +279,32 @@ public class IDVKeyAPIClient {
     private void checkStatus(CloseableHttpResponse response) throws IOException {
         final int retCode = response.getStatusLine().getStatusCode();
         if (retCode < 200 || retCode > 299) {
-            throw new IOException("Server returned " + response.getStatusLine());
+            String msg;
+            if (response.getEntity() != null) {
+                try {
+                    msg = IOUtils.toString(response.getEntity().getContent());
+                } catch (Exception e) {
+                    msg = "";
+                }
+            } else {
+                msg = "";
+            }
+            throw new IOException("Server returned " + response.getStatusLine() + " : " + msg);
         }
     }
 
-    private String get(String path) throws IOException {
+    protected String get(String path) throws IOException {
         final HttpGet req = new HttpGet(buildUrl(path));
         return exec(req);
     }
 
-    private String postJson(String path, Object obj) throws IOException {
+    protected String postJson(String path, Object obj) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
         post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
         return exec(post);
     }
 
-    private String post(String path, String string) throws IOException {
+    protected String post(String path, String string) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
         if (string != null) {
             post.setEntity(new StringEntity(string));
@@ -306,7 +316,11 @@ public class IDVKeyAPIClient {
         final CloseableHttpResponse response = httpClient.execute(req);
         try {
             checkStatus(response);
-            return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+            if (response.getEntity() != null) {
+                return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
+            } else {
+                return null;
+            }
         } finally {
             response.close();
         }
