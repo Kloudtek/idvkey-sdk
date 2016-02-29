@@ -19,6 +19,15 @@ public class UserDb {
         return users.get(username);
     }
 
+    public synchronized User findUserByIdvkeyId(String idvkeyId) {
+        for (User user : users.values()) {
+            if( idvkeyId.equals(user.getIdvkeyId() ) ) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public synchronized User createUser(String username, String password) {
         User user = new User(username, password);
         users.put(username, user);

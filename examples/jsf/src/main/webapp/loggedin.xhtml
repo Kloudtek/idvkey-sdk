@@ -29,10 +29,6 @@
             <div id="content">
                 <div id="banner"><img src="images/img07.jpg" alt="" /></div>
                 <h:form>
-                    <p:commandButton value="Link User to IDVKey" rendered="#{not userCtx.linked}"
-                                     actionListener="#{userCtx.linkUser}" ajax="false"/>
-                </h:form>
-                <h:form rendered="#{userCtx.linked}">
                     <p:fieldset legend="Request task to be executed">
                         <div>
                             <p:watermark for="taskdetails" value="Task details"/>

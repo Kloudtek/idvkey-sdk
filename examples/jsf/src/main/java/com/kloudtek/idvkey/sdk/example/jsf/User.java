@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class User implements Serializable {
     private String username;
     private String password;
-    private boolean idvkeyLinked;
+    private String idvkeyId;
 
     public User(String username, String password) {
         this.username = username;
@@ -27,11 +27,11 @@ public class User implements Serializable {
         return this.password.equals(password);
     }
 
-    public boolean isIdvkeyLinked() {
-        return idvkeyLinked;
+    public String getIdvkeyId() {
+        return idvkeyId;
     }
 
-    public void setIdvkeyLinked(boolean idvkeyLinked) {
-        this.idvkeyLinked = idvkeyLinked;
+    public void setIdvkeyId(String idvkeyId) {
+        this.idvkeyId = idvkeyId;
     }
 }

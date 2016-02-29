@@ -34,6 +34,7 @@ public class IDVKeyLogin implements Serializable {
     @Value("${websiteId}")
     private transient String websiteId;
     private String authOpId;
+    private String idvkeyId;
 
     public void login() throws IOException {
         final OperationResult operationResult = apiClient.authenticateUser(websiteId,
@@ -46,9 +47,18 @@ public class IDVKeyLogin implements Serializable {
     @RequestMapping("/verifyauth")
     public ModelAndView verifyAuth(ModelMap model) throws IOException {
         // let's verify the user has authenticated successfully before setting him/her as authenticated.
-        final String username = apiClient.confirmUserAuthentication(authOpId);
-        userCtx.setUser(userDb.findUser(username));
+        idvkeyId = apiClient.confirmUserAuthentication(authOpId);
+        User user = userDb.findUserByIdvkeyId(idvkeyId);
         model.addAttribute("attribute", "redirectWithRedirectPrefix");
-        return new ModelAndView("redirect:/loggedin.xhtml", model);
+        if( user != null ) {
+            userCtx.setUser(user);
+            return new ModelAndView("redirect:/loggedin.xhtml", model);
+        } else {
+            return new ModelAndView("redirect:/linkidvkey.xhtml", model);
+        }
+    }
+
+    public String getIdvkeyId() {
+        return idvkeyId;
     }
 }

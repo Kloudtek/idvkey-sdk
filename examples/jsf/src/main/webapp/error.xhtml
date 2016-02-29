@@ -12,10 +12,6 @@
 <h:head>
     <title>Example IDVKey integration website</title>
     <h:outputStylesheet library="css" name="style.css"/>
-    <f:metadata>
-        <f:viewParam name="userRef" value="#{userCtx.linkedUserRef}"/>
-        <f:viewAction action="#{userCtx.verifyLink}"/>
-    </f:metadata>
 </h:head>
 <h:body>
     <div id="wrapper">
@@ -30,7 +26,7 @@
             </ul>
         </div>
         <div id="page">
-            An unexpected error has occured
+            An unexpected error has occurred
         </div>
         <!-- end #page -->
     </div>
