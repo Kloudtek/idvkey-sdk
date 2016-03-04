@@ -44,10 +44,6 @@ public class UserCtx {
     }
 
     public String getLinkedUserRef() {
-        return linkedUserRef;
-    }
-
-    public void setLinkedUserRef(String linkedUserRef) {
-        this.linkedUserRef = linkedUserRef;
+        return user.getIdvkeyId();
     }
 }
