@@ -56,6 +56,7 @@ public class IDVKeyAPIClient {
      *
      * @param keyId     Key id
      * @param base64Key A {@link SignAndVerifyKey} key
+     * @throws InvalidKeyException if the key was invalid
      */
     public IDVKeyAPIClient(String keyId, KeyType keyType, String base64Key) throws InvalidKeyException {
         this(keyId, keyType, base64Decode(base64Key));
@@ -66,6 +67,7 @@ public class IDVKeyAPIClient {
      *
      * @param keyId   Key id
      * @param keyData A {@link SignAndVerifyKey} key
+     * @throws InvalidKeyException if the key was invalid
      */
     public IDVKeyAPIClient(String keyId, KeyType keyType, byte[] keyData) throws InvalidKeyException {
         if (keyType != KeyType.HMAC_SHA256) {
@@ -147,6 +149,7 @@ public class IDVKeyAPIClient {
      * @param cancelUrl   URL to redirect user to should he wish to cancel the linking
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException If the server returned an error
+     * @throws UserAlreadyLinkedException if the user was already linked
      */
     public URL linkUser(String serviceId, URL redirectUrl, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException {
         final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef, redirectUrl, cancelUrl));
@@ -244,6 +247,7 @@ public class IDVKeyAPIClient {
      * @param cancelUrl       URL to redirect browser if the user wants to cancel the operation.
      * @param approvalRequest Approval request details  @return Operation results
      * @throws IOException If an error occurs while performing the operation
+     * @return operation result
      */
     @SuppressWarnings("ConstantConditions")
     public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull URL redirectUrl,
