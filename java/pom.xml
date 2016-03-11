@@ -13,6 +13,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>idvkey-sdk-java</artifactId>
+    <name>IDVKey Java SDK</name>
 
     <dependencies>
         <dependency>
