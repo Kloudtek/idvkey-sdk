@@ -111,6 +111,10 @@
             <name>Kloudtek OSS Releases Repository</name>
             <url>${repo.oss.release.url}</url>
         </repository>-->
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
         <snapshotRepository>
             <id>kloudtek-oss-snapshots</id>
             <name>Kloudtek OSS Snapshots Repository</name>
