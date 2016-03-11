@@ -106,11 +106,11 @@
         </plugins>
     </build>
     <distributionManagement>
-        <repository>
+<!--        <repository>
             <id>kloudtek-oss-releases</id>
             <name>Kloudtek OSS Releases Repository</name>
             <url>${repo.oss.release.url}</url>
-        </repository>
+        </repository>-->
         <snapshotRepository>
             <id>kloudtek-oss-snapshots</id>
             <name>Kloudtek OSS Snapshots Repository</name>
