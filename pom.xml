@@ -19,8 +19,7 @@
         <module>api</module>
         <module>examples/jsf</module>
     </modules>
-
-    <description>IDVKey Java Software Development Kit</description>
+    <description>IDVKey Software Development Kit</description>
     <url>https://github.com/Kloudtek/idvkey-sdk</url>
     <organization>
         <name>Kloudtek</name>
@@ -38,10 +37,9 @@
     <properties>
         <repo.oss.snapshot.url/>
         <repo.oss.release.url/>
-        <kryptotek-oss.version>1.0.12</kryptotek-oss.version>
-        <ktutils.version>1.2.5</ktutils.version>
+        <kryptotek-oss.version>1.0.14</kryptotek-oss.version>
+        <ktutils.version>1.2.4</ktutils.version>
         <gpg.key/>
-        <gpg.pw/>
     </properties>
     <licenses>
         <license>
@@ -49,7 +47,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
     <build>
         <plugins>
             <plugin>
@@ -103,6 +100,17 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.6</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <distributionManagement>
@@ -136,17 +144,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.6</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
