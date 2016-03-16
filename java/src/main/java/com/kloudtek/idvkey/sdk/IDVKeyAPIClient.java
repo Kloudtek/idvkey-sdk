@@ -5,10 +5,7 @@
 package com.kloudtek.idvkey.sdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kloudtek.idvkey.api.ApprovalRequest;
-import com.kloudtek.idvkey.api.ApprovalState;
-import com.kloudtek.idvkey.api.KeyType;
-import com.kloudtek.idvkey.api.OperationResult;
+import com.kloudtek.idvkey.api.*;
 import com.kloudtek.kryptotek.CryptoUtils;
 import com.kloudtek.kryptotek.DigestAlgorithm;
 import com.kloudtek.kryptotek.jce.JCECryptoEngine;
@@ -36,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.security.InvalidKeyException;
+import java.util.List;
 
 import static com.kloudtek.util.StringUtils.base64Decode;
 import static com.kloudtek.util.StringUtils.urlEncode;
@@ -46,7 +44,7 @@ import static org.apache.http.auth.AuthScope.ANY;
  */
 public class IDVKeyAPIClient {
     public static final int DEFAULT_TIMEOUT = 30000;
-    public static final String IDVKEY_URL = "https://portal.idvkey.com";
+    public static final String IDVKEY_URL = "https://api.idvkey.com";
     protected CloseableHttpClient httpClient;
     protected String serverUrl;
     private static final ObjectMapper jsonMapper = new ObjectMapper();
@@ -140,6 +138,14 @@ public class IDVKeyAPIClient {
     }
 
     /**
+     * Return the list of services that have been registered on IDVKey
+     * @return list of services
+     */
+    public List<Service> getServices() throws IOException {
+        return jsonMapper.readValue(get("api/services"), jsonMapper.getTypeFactory().constructCollectionType(List.class, Service.class));
+    }
+
+    /**
      * Link an IDVKey user to your service/website.
      * You need to call this operation before a user on your website can use his IDVKey device
      *
@@ -175,7 +181,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If the server returned an error
      */
     public void unlinkUser(String serviceId, String userRef) throws IOException {
-        final HttpDelete req = new HttpDelete(linkUserUrl(serviceId, userRef));
+        final HttpDelete req = new HttpDelete(url("api/services/" + serviceId + "/linked").path(userRef, true).toUri());
         try {
             checkStatus(httpClient.execute(req));
         } catch (IOException e) {
@@ -194,14 +200,15 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public boolean isUserLinked(String serviceId, String userRef) throws IOException {
-        final HttpGet req = new HttpGet(linkUserUrl(serviceId, userRef));
+        final HttpGet req = new HttpGet(url("api/services/" + serviceId + "/linked").path(userRef, true).toUri());
         try {
             final CloseableHttpResponse response = httpClient.execute(req);
             final int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == 404) {
                 return false;
             } else if (statusCode == 200) {
-                return Boolean.parseBoolean(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
+//                ServiceLinkedUser serviceLinkedUser = jsonMapper.readValue(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())), ServiceLinkedUser.class);
+                return true;
             } else {
                 throw new IOException("Server returned " + response.getStatusLine());
             }
@@ -222,7 +229,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl) throws IOException {
-        String url = new URLBuilder("api/idvkey/authenticate").add("serviceId", serviceId).add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).toString();
+        String url = new URLBuilder("api/v1/authenticate").add("serviceId", serviceId).add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).toString();
         final String jsonOpRes = post(url, null);
         return jsonMapper.readValue(jsonOpRes, OperationResult.class);
     }
@@ -235,7 +242,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public String confirmUserAuthentication(@NotNull String opId) throws IOException {
-        return get("api/idvkey/authenticate?opId=" + urlEncode(opId));
+        return get("api/v1/authenticate?opId=" + urlEncode(opId));
     }
 
     /**
@@ -259,8 +266,11 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final String json = postJson(new URLBuilder("api/idvkey/approve").add("serviceId", serviceId)
-                .add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).add("userRef", userRef).toString(), approvalRequest);
+        URLBuilder urlBuilder = new URLBuilder("api/v1/approve").param("serviceId", serviceId)
+                .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).
+                        param("userRef", userRef);
+        String path = urlBuilder.toString();
+        final String json = postJson(path, approvalRequest);
         return jsonMapper.readValue(json, OperationResult.class);
     }
 
@@ -272,7 +282,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final String state = get("api/idvkey/approve?opId=" + urlEncode(opId));
+        final String state = get("api/v1/approve?opId=" + urlEncode(opId));
         try {
             return ApprovalState.valueOf(state);
         } catch (IllegalArgumentException e) {
@@ -317,6 +327,7 @@ public class IDVKeyAPIClient {
     }
 
     private String exec(HttpUriRequest req) throws IOException {
+        req.setHeader("api-version", "1.0");
         final CloseableHttpResponse response = httpClient.execute(req);
         try {
             checkStatus(response);
@@ -335,7 +346,7 @@ public class IDVKeyAPIClient {
     }
 
     private URI buildUrl(String path) {
-        return new URLBuilder(serverUrl).addPath(path).toUri();
+        return new URLBuilder(serverUrl).path(path).toUri();
     }
 
     private URI linkUserUrl(String serviceId, String userRef) {
@@ -347,6 +358,6 @@ public class IDVKeyAPIClient {
     }
 
     private URLBuilder linkUrlUrlBuilder(String serviceId, String userRef) {
-        return url("api/idvkey/linkuser").add("serviceId", serviceId).add("userRef", userRef);
+        return url("api/services/" + serviceId + "/linked").add("userRef", userRef);
     }
 }
