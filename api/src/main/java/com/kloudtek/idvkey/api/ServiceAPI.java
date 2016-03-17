@@ -49,6 +49,13 @@ public interface ServiceAPI {
     @Path("{serviceId}/notifications/authentication")
     @AuthenticateCustomer
     @Produces("application/json")
-    OperationResult requestUserAuthentication(@PathParam("serviceId") String serviceId, @QueryParam("redirectUrl") String redirectUrl,
-                                              @QueryParam("cancelUrl") String cancelUrl);
+    OperationResult requestAuthentication(@PathParam("serviceId") String serviceId, @QueryParam("redirectUrl") String redirectUrl,
+                                          @QueryParam("cancelUrl") String cancelUrl);
+
+    @POST
+    @Path("{serviceId}/notifications/approval")
+    @AuthenticateCustomer
+    @Consumes("application/json")
+    @Produces("application/json")
+    OperationResult requestApproval(@PathParam("serviceId") String serviceId, ApprovalRequest req);
 }

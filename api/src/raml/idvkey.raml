@@ -80,10 +80,27 @@ securitySchemes:
   /authentication/:
     /{opId}:
       get:
-        description: Retrieve the approval's status (and response if exists)
+        description: Retrieve the authentication's status (and response if exists)
         responses:
           200:
             body:
               application/json:
           404:
+            description: authentication or service not found
+            body:
+              text/plain:
+                description: Error details
+  /approval/:
+    /{opId}:
+      get:
+        description: Retrieve the approval's status
+        responses:
+          200:
+            body:
+              text/plain:
+                description: one of the following values: PENDING, APPROVED, DENIED
+          404:
             description: notification not found
+            body:
+              text/plain:
+                description: Error details

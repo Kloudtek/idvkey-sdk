@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Kloudtek Ltd
+ * Copyright (c) 2016 Kloudtek Ltd
  */
 
 package com.kloudtek.idvkey.api;
@@ -7,33 +7,68 @@ package com.kloudtek.idvkey.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URL;
+
 /**
  * Used to request a confirmation from a user
  */
 public class ApprovalRequest {
     @JsonProperty
-    protected String title;
+    private String userRef;
     @JsonProperty
-    protected String text;
+    private URL redirectUrl;
     @JsonProperty
-    protected boolean centeredHorizontal = true;
+    private URL cancelUrl;
     @JsonProperty
-    protected boolean centeredVertical = true;
+    private String title;
     @JsonProperty
-    protected String denyConfirmMsg;
+    private String text;
     @JsonProperty
-    protected String approveConfirmMsg;
+    private boolean centeredHorizontal = true;
     @JsonProperty
-    protected String denyMsg;
+    private boolean centeredVertical = true;
     @JsonProperty
-    protected String approveMsg;
+    private String denyConfirmMsg;
+    @JsonProperty
+    private String approveConfirmMsg;
+    @JsonProperty
+    private String denyMsg;
+    @JsonProperty
+    private String approveMsg;
 
     public ApprovalRequest() {
     }
 
-    public ApprovalRequest(@NotNull String title, @NotNull String text) {
+    public ApprovalRequest(@NotNull String userRef, @NotNull URL redirectUrl, @NotNull URL cancelUrl, @NotNull String title, @NotNull String text) {
+        this.userRef = userRef;
+        this.redirectUrl = redirectUrl;
+        this.cancelUrl = cancelUrl;
         this.title = title;
         this.text = text;
+    }
+
+    public String getUserRef() {
+        return userRef;
+    }
+
+    public void setUserRef(String userRef) {
+        this.userRef = userRef;
+    }
+
+    public URL getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public void setRedirectUrl(URL redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
+
+    public URL getCancelUrl() {
+        return cancelUrl;
+    }
+
+    public void setCancelUrl(URL cancelUrl) {
+        this.cancelUrl = cancelUrl;
     }
 
     public String getTitle() {

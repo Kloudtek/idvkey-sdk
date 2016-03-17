@@ -36,7 +36,6 @@ import java.security.InvalidKeyException;
 import java.util.List;
 
 import static com.kloudtek.util.StringUtils.base64Decode;
-import static com.kloudtek.util.StringUtils.urlEncode;
 import static org.apache.http.auth.AuthScope.ANY;
 
 /**
@@ -259,8 +258,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
-    public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull URL redirectUrl,
-                                           @NotNull URL cancelUrl, @NotNull ApprovalRequest approvalRequest) throws IOException {
+    public OperationResult requestApproval(@NotNull String serviceId, @NotNull ApprovalRequest approvalRequest) throws IOException {
         if (approvalRequest == null) {
             throw new IllegalArgumentException("approval request missing");
         } else if (StringUtils.isBlank(approvalRequest.getTitle())) {
@@ -268,11 +266,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        URLBuilder urlBuilder = new URLBuilder("api/notifications/approve").param("serviceId", serviceId)
-                .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).
-                        param("userRef", userRef);
-        String path = urlBuilder.toString();
-        final String json = postJson(path, approvalRequest);
+        final String json = postJson("api/services/" + serviceId + "/notifications/approval", approvalRequest);
         return jsonMapper.readValue(json, OperationResult.class);
     }
 
@@ -284,7 +278,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final String state = get("api/notifications/approve?opId=" + urlEncode(opId));
+        final String state = get("api/notifications/approval/" + opId);
         try {
             return ApprovalState.valueOf(state);
         } catch (IllegalArgumentException e) {

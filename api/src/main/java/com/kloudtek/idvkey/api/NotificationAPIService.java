@@ -4,7 +4,10 @@
 
 package com.kloudtek.idvkey.api;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 /**
  * Interface of JAX-RS IDVKey REST API server
@@ -24,18 +27,9 @@ public interface NotificationAPIService {
     @AuthenticateCustomer
     AuthenticationStatus confirmUserAuthentication(@PathParam("opId") String opId);
 
-    @POST
-    @Path("approve")
-    @AuthenticateCustomer
-    @Consumes("application/json")
-    @Produces("application/json")
-    OperationResult requestApproval(@QueryParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
-                                    @QueryParam("redirectUrl") String redirectUrl, @QueryParam("cancelUrl") String cancelUrl,
-                                    ApprovalRequest req);
-
     @GET
-    @Path("approve")
+    @Path("approval/{opId}")
     @AuthenticateCustomer
     @Produces("text/plain")
-    ApprovalState getUserApprovalState(@QueryParam("opId") String opId);
+    ApprovalState getUserApprovalState(@PathParam("opId") String opId);
 }
