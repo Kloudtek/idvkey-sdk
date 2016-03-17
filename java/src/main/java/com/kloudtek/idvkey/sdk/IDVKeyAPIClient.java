@@ -139,6 +139,7 @@ public class IDVKeyAPIClient {
 
     /**
      * Return the list of services that have been registered on IDVKey
+     *
      * @return list of services
      */
     public List<Service> getServices() throws IOException {
@@ -154,10 +155,10 @@ public class IDVKeyAPIClient {
      * @param userRef     User reference (generally the user's username on your website)
      * @param cancelUrl   URL to redirect user to should he wish to cancel the linking
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
-     * @throws IOException If the server returned an error
+     * @throws IOException                If the server returned an error
      * @throws UserAlreadyLinkedException if the user was already linked
      */
-    public URL linkUser(String serviceId, URL redirectUrl, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException {
+    public OperationResult linkUser(String serviceId, URL redirectUrl, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException {
         final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef, redirectUrl, cancelUrl));
         try {
             final CloseableHttpResponse response = httpClient.execute(req);
@@ -167,7 +168,7 @@ public class IDVKeyAPIClient {
             } else if (retCode < 200 || retCode > 299) {
                 throw new IOException("Server returned " + response.getStatusLine());
             }
-            return new URL(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())));
+            return jsonMapper.readValue(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())), OperationResult.class);
         } finally {
             req.releaseConnection();
         }
@@ -222,14 +223,15 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId   Website serviceId
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
-     * @param cancelUrl URL that the user's browser should be redirected to if he cancelled the authentication.
+     * @param cancelUrl   URL that the user's browser should be redirected to if he cancelled the authentication.
      * @return Operation result. This will contain the URL you should redirect your user's browser to.
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException If error occurred performing the operation
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl) throws IOException {
-        String url = new URLBuilder("api/v1/authenticate").add("serviceId", serviceId).add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).toString();
+        String url = new URLBuilder("api/services/" + serviceId + "/notifications/authentication")
+                .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).toString();
         final String jsonOpRes = post(url, null);
         return jsonMapper.readValue(jsonOpRes, OperationResult.class);
     }
@@ -238,11 +240,11 @@ public class IDVKeyAPIClient {
      * Confirm that user Authentication was done successfully
      *
      * @param opId Operation id returned by {@link #authenticateUser(String, URL, URL)}
-     * @return Authenticated user ref
+     * @return Authentication status
      * @throws IOException If error occurred performing the operation
      */
-    public String confirmUserAuthentication(@NotNull String opId) throws IOException {
-        return get("api/v1/authenticate?opId=" + urlEncode(opId));
+    public AuthenticationStatus getAuthenticationStatus(@NotNull String opId) throws IOException {
+        return jsonMapper.readValue(get("api/notifications/authentication/" + opId), AuthenticationStatus.class);
     }
 
     /**
@@ -253,8 +255,8 @@ public class IDVKeyAPIClient {
      * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired).
      * @param cancelUrl       URL to redirect browser if the user wants to cancel the operation.
      * @param approvalRequest Approval request details  @return Operation results
-     * @throws IOException If an error occurs while performing the operation
      * @return operation result
+     * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
     public OperationResult requestApproval(@NotNull String serviceId, @NotNull String userRef, @NotNull URL redirectUrl,
@@ -266,7 +268,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        URLBuilder urlBuilder = new URLBuilder("api/v1/approve").param("serviceId", serviceId)
+        URLBuilder urlBuilder = new URLBuilder("api/notifications/approve").param("serviceId", serviceId)
                 .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).
                         param("userRef", userRef);
         String path = urlBuilder.toString();
@@ -282,7 +284,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final String state = get("api/v1/approve?opId=" + urlEncode(opId));
+        final String state = get("api/notifications/approve?opId=" + urlEncode(opId));
         try {
             return ApprovalState.valueOf(state);
         } catch (IllegalArgumentException e) {
@@ -293,17 +295,17 @@ public class IDVKeyAPIClient {
     private void checkStatus(CloseableHttpResponse response) throws IOException {
         final int retCode = response.getStatusLine().getStatusCode();
         if (retCode < 200 || retCode > 299) {
-            String msg;
+            String body;
             if (response.getEntity() != null) {
                 try {
-                    msg = IOUtils.toString(response.getEntity().getContent());
+                    body = IOUtils.toString(response.getEntity().getContent());
                 } catch (Exception e) {
-                    msg = "";
+                    body = "";
                 }
             } else {
-                msg = "";
+                body = "";
             }
-            throw new IOException("Server returned " + response.getStatusLine() + " : " + msg);
+            throw new HttpException(response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode(), body);
         }
     }
 

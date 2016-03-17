@@ -12,7 +12,6 @@ securitySchemes:
       200:
         body:
           application/json:
-            schema: services
   /{serviceId}:
     /linked:
       post:
@@ -25,8 +24,10 @@ securitySchemes:
           cancelUrl:
             description: URL to redirect user if he decides to deny the link
         responses:
-          200:
+          201:
             description: User has been successfully linked
+          409:
+            description: User ref already associated with a user
           404:
             description: Service does not exist
       /{userRef}:
@@ -37,26 +38,52 @@ securitySchemes:
               description: User is currently linked
               body:
                 application/json:
-                  schema: UserLinkInfo
             404:
               description: User is not linked, or service does not exist
         delete:
           description: Delete user link
           responses:
-            200:
+            201:
               description: User was unlinked
             404:
               description: User is not linked, or service does not exist
+              body:
+                text/plain:
+                  description: Error details
     /notifications:
       /authentication:
         post:
-            description: Request user authentication
-        /{opId}:
-          get:
-            description: Retrieve the authentication's status (and response if exists)
+          description: Request user authentication
+          queryParameters:
+            redirectUrl:
+              description: URL to redirect user to after he's successfully approved linking
+            cancelUrl:
+              description: URL to redirect user if he decides to deny the link
+          responses:
+            200:
+              body:
+                text/plain:
+                  description: operation id (opId) that will be used to check the status on the request
+            404:
+              description: service not found
       /approval:
         post:
             description: Request user approval
-        /{opId}:
-          get:
-            description: Retrieve the approval's status (and response if exists)
+            responses:
+              200:
+                body:
+                  text/plain:
+                    description: operation id (opId) that will be used to check the status on the request
+              404:
+                description: service not found
+/notifications/:
+  /authentication/:
+    /{opId}:
+      get:
+        description: Retrieve the approval's status (and response if exists)
+        responses:
+          200:
+            body:
+              application/json:
+          404:
+            description: notification not found

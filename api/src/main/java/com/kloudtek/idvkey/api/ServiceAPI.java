@@ -29,9 +29,10 @@ public interface ServiceAPI {
      */
     @POST
     @Path("{serviceId}/linked")
+    @Produces("application/json")
     @AuthenticateCustomer
-    String requestUserLink(@PathParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
-                           @QueryParam("redirectUrl") String redirectUrl, @QueryParam("cancelUrl") String cancelUrl);
+    OperationResult requestUserLink(@PathParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
+                                    @QueryParam("redirectUrl") String redirectUrl, @QueryParam("cancelUrl") String cancelUrl);
 
     @GET
     @Path("{serviceId}/linked/{userRef}")
@@ -43,4 +44,11 @@ public interface ServiceAPI {
     @Path("{serviceId}/linked/{userRef}")
     @AuthenticateCustomer
     void unlinkUserFromCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef);
+
+    @POST
+    @Path("{serviceId}/notifications/authentication")
+    @AuthenticateCustomer
+    @Produces("application/json")
+    OperationResult requestUserAuthentication(@PathParam("serviceId") String serviceId, @QueryParam("redirectUrl") String redirectUrl,
+                                              @QueryParam("cancelUrl") String cancelUrl);
 }
