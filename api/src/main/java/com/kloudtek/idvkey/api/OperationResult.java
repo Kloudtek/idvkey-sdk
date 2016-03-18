@@ -15,13 +15,16 @@ public class OperationResult {
     @JsonProperty
     private String opId;
     @JsonProperty
+    private String opRef;
+    @JsonProperty
     private URL redirectUrl;
 
     public OperationResult() {
     }
 
-    public OperationResult(String opId, URL redirectUrl) {
+    public OperationResult(String opId, String opRef, URL redirectUrl) {
         this.opId = opId;
+        this.opRef = opRef;
         this.redirectUrl = redirectUrl;
     }
 

@@ -5,12 +5,14 @@
 package com.kloudtek.idvkey.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import java.util.Date;
 
 /**
  * Represents a customer service (generally a website)
  */
+@JsonRootName("service")
 public class Service {
     @JsonProperty
     private String id;

@@ -28,34 +28,20 @@ public interface ServiceAPI {
      * @param cancelUrl       URL to redirect to if the user wants to cancel the operation
      */
     @POST
-    @Path("{serviceId}/linked")
+    @Path("{serviceId}/links")
     @Produces("application/json")
+    @Consumes("application/json")
     @AuthenticateCustomer
-    OperationResult requestUserLink(@PathParam("serviceId") String serviceId, @QueryParam("userRef") String userRef,
-                                    @QueryParam("redirectUrl") String redirectUrl, @QueryParam("cancelUrl") String cancelUrl);
+    OperationResult requestUserLink(@PathParam("serviceId") String serviceId, ServiceLinkRequest serviceLinkRequest);
 
     @GET
-    @Path("{serviceId}/linked/{userRef}")
+    @Path("{serviceId}/links/ref/{userRef}")
     @AuthenticateCustomer
     @Produces("application/json")
-    UserLinkInfo getLinkStateByRef(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef);
+    ServiceLink getLinkStateByRef(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef);
 
     @DELETE
-    @Path("{serviceId}/linked/{userRef}")
+    @Path("{serviceId}/links/ref/{userRef}")
     @AuthenticateCustomer
     void unlinkUserFromCustomerService(@PathParam("serviceId") String serviceId, @PathParam("userRef") String userRef);
-
-    @POST
-    @Path("{serviceId}/notifications/authentication")
-    @AuthenticateCustomer
-    @Produces("application/json")
-    OperationResult requestAuthentication(@PathParam("serviceId") String serviceId, @QueryParam("redirectUrl") String redirectUrl,
-                                          @QueryParam("cancelUrl") String cancelUrl);
-
-    @POST
-    @Path("{serviceId}/notifications/approval")
-    @AuthenticateCustomer
-    @Consumes("application/json")
-    @Produces("application/json")
-    OperationResult requestApproval(@PathParam("serviceId") String serviceId, ApprovalRequest req);
 }

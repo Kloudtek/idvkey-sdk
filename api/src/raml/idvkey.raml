@@ -1,43 +1,66 @@
 #%RAML 0.8
 title: IDVKey API
 version: 0.91
-baseUri: https://api.github.com/api
+baseUri: https://api.idvkey.com/api
 protocols: [ HTTPS ]
-securitySchemes:
-  - x-kryptotek: !include kryptotek-httpauth.raml
+mediaType:  application/json
 /services:
-  description: Retrieve the list of owned websites/services
+  description: Websites/Services management
   get:
+    description: Retrieve the list of owned websites/services
     responses:
       200:
         body:
           application/json:
+            schema: !include service.json
+            example: !include service-example.json
   /{serviceId}:
-    /linked:
+    /links:
       post:
-        description: Request a user for his permission to link him to a customer service/website.
-        queryParameters:
-          userRef:
-            description: User reference to assign user
-          redirectUrl:
-            description: URL to redirect user to after he's successfully approved linking
-          cancelUrl:
-            description: URL to redirect user if he decides to deny the link
+        description: This will request the user to approve linking to your service.
+
+          This will return an operationResult which include the operation id (opId), the operation reference (opRef), and the
+          url at which you should redirect the user's browser after completion (or should the user wish to cancel the operation).
+
+          Like for notification operations, you should store the opId and opRef in order to validate the user has approved or denied the linking.
+
+          Once the user has approved (or denied) the linking, the user browser will be redirected to the url specified
+          in the query parameters, which will be appended with a *opRef* query parameter. You will then use this opRef
+          to call the GET REST api of this same url, in order to check if the linking was approved or denied. Please note that
+          once the user has approved or denied the operation, you will only have 48 hours during which you can check the link
+          operation status.
+        body:
+          application/json:
+            schema: !include serviceLinkRequest.json
+            example: !include serviceLinkRequest-example.json
         responses:
-          201:
-            description: User has been successfully linked
+          200:
+            description: Returns the operation id, ref and the url where the user browser should be redirected to in order to complete the operation.
+            body:
+              application/json:
+                schema: !include operationResult.json
+                example: !include operationResult-example.json
           409:
             description: User ref already associated with a user
           404:
             description: Service does not exist
-      /{userRef}:
+      get:
+        description: Check the status of a link operation request
+          queryParameters:
+            opId:
+              description: The opId that was returned in the linking request operation
+        responses:
+          200:
+            description: Returns
+      /ref/{userRef}:
         get:
-          description: Get a user's link state.
+          description: Get a user's link state using it's userRef
           responses:
             200:
               description: User is currently linked
               body:
-                application/json:
+                schema: !include serviceLink.json
+                example: !include serviceLink-example.json
             404:
               description: User is not linked, or service does not exist
         delete:
@@ -47,37 +70,28 @@ securitySchemes:
               description: User was unlinked
             404:
               description: User is not linked, or service does not exist
-              body:
-                text/plain:
-                  description: Error details
     /notifications:
       /authentication:
-        post:
-          description: Request user authentication
-          queryParameters:
-            redirectUrl:
-              description: URL to redirect user to after he's successfully approved linking
-            cancelUrl:
-              description: URL to redirect user if he decides to deny the link
-          responses:
-            200:
-              body:
-                text/plain:
-                  description: operation id (opId) that will be used to check the status on the request
-            404:
-              description: service not found
       /approval:
-        post:
-            description: Request user approval
-            responses:
-              200:
-                body:
-                  text/plain:
-                    description: operation id (opId) that will be used to check the status on the request
-              404:
-                description: service not found
-/notifications/:
-  /authentication/:
+/notifications:
+  description: Notification operations
+  /authentication:
+    post:
+      description: Request user authentication
+      queryParameters:
+        serviceId:
+          description: Service id
+        redirectUrl:
+          description: URL to redirect user to after he's successfully approved linking
+        cancelUrl:
+          description: URL to redirect user if he decides to deny the link
+      responses:
+        200:
+          body:
+            text/plain:
+              description: operation id (opId) that will be used to check the status on the request
+        404:
+          description: service not found
     /{opId}:
       get:
         description: Retrieve the authentication's status (and response if exists)
@@ -90,7 +104,19 @@ securitySchemes:
             body:
               text/plain:
                 description: Error details
-  /approval/:
+  /approval:
+    post:
+      description: Request user approval
+      queryParameters:
+        serviceId:
+          description: Service id
+      responses:
+        200:
+          body:
+            text/plain:
+              description: operation id (opId) that will be used to check the status on the request
+        404:
+          description: service not found
     /{opId}:
       get:
         description: Retrieve the approval's status
@@ -98,7 +124,7 @@ securitySchemes:
           200:
             body:
               text/plain:
-                description: one of the following values: PENDING, APPROVED, DENIED
+                description: one of the following values PENDING, APPROVED, DENIED
           404:
             description: notification not found
             body:

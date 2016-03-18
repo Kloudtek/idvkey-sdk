@@ -1,0 +1,5 @@
+{
+  "userRef": "my-user-ref",
+  "url": "http://mysite/linked.html",
+  "cancelUrl": "http://mysite/link-cancel.html"
+}

@@ -113,7 +113,7 @@ public class IDVKeyAPIClient {
         httpClientBuilder.setDefaultRequestConfig(requestBuilder.build());
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         // This is used to used to adjust http timestamps in case client has the wrong time
-        final TimeAsHttpContentTimeSync timeSync = new TimeAsHttpContentTimeSync(new URLBuilder(serverUrl).addPath("/public/time").toString());
+        final TimeAsHttpContentTimeSync timeSync = new TimeAsHttpContentTimeSync(new URLBuilder(serverUrl).path("/public/time").toString());
         credentialsProvider.setCredentials(ANY, new RestAuthCredential(keyId, signingKey, signatureVerificationKey,
                 DigestAlgorithm.SHA256, timeSync));
         httpClient = httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider).build();
@@ -149,27 +149,26 @@ public class IDVKeyAPIClient {
      * Link an IDVKey user to your service/website.
      * You need to call this operation before a user on your website can use his IDVKey device
      *
-     * @param serviceId   Your website serviceId
-     * @param redirectUrl The URL to which the user's browser will be redirected to after he's approved the link
-     * @param userRef     User reference (generally the user's username on your website)
-     * @param cancelUrl   URL to redirect user to should he wish to cancel the linking
+     * @param url       The URL to which the user's browser will be redirected to after he's approved the link
+     * @param serviceId Your website serviceId
+     * @param userRef   User reference (generally the user's username on your website)
+     * @param cancelUrl URL to redirect user to should he wish to cancel the linking
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException                If the server returned an error
-     * @throws UserAlreadyLinkedException if the user was already linked
+     * @throws UserAlreadyLinkedException If the user was already linked
+     * @throws ServiceNotFoundException   If the service was not found
      */
-    public OperationResult linkUser(String serviceId, URL redirectUrl, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException {
-        final HttpPost req = new HttpPost(linkUserUrl(serviceId, userRef, redirectUrl, cancelUrl));
+    public OperationResult linkUser(String serviceId, URL url, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException, ServiceNotFoundException {
         try {
-            final CloseableHttpResponse response = httpClient.execute(req);
-            final int retCode = response.getStatusLine().getStatusCode();
-            if (retCode == 409) {
+            return jsonMapper.readValue(postJson("api/services/" + serviceId + "/links", new ServiceLinkRequest(userRef, url, cancelUrl)), OperationResult.class);
+        } catch (HttpException e) {
+            if (e.getStatusCode() == 409) {
                 throw new UserAlreadyLinkedException();
-            } else if (retCode < 200 || retCode > 299) {
-                throw new IOException("Server returned " + response.getStatusLine());
+            } else if (e.getStatusCode() == 404) {
+                throw new ServiceNotFoundException();
+            } else {
+                throw e;
             }
-            return jsonMapper.readValue(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())), OperationResult.class);
-        } finally {
-            req.releaseConnection();
         }
     }
 
@@ -181,11 +180,12 @@ public class IDVKeyAPIClient {
      * @throws IOException If the server returned an error
      */
     public void unlinkUser(String serviceId, String userRef) throws IOException {
-        final HttpDelete req = new HttpDelete(url("api/services/" + serviceId + "/linked").path(userRef, true).toUri());
         try {
-            checkStatus(httpClient.execute(req));
-        } catch (IOException e) {
-            req.releaseConnection();
+            delete(new URLBuilder("api/services/" + serviceId + "/links/ref/").path(userRef, true).toString());
+        } catch (HttpException e) {
+            if (e.getStatusCode() != 404) {
+                throw e;
+            }
         }
     }
 
@@ -196,24 +196,18 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId Website serviceId
      * @param userRef   User reference (generally the user's username on your website)
-     * @return true if the user is linked against your website
+     * @return Service link details or null if no service link with that userRef was found.
      * @throws IOException If error occurred performing the operation
      */
-    public boolean isUserLinked(String serviceId, String userRef) throws IOException {
-        final HttpGet req = new HttpGet(url("api/services/" + serviceId + "/linked").path(userRef, true).toUri());
+    public ServiceLink getServiceLinkInfo(String serviceId, String userRef) throws IOException {
         try {
-            final CloseableHttpResponse response = httpClient.execute(req);
-            final int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == 404) {
-                return false;
-            } else if (statusCode == 200) {
-//                ServiceLinkedUser serviceLinkedUser = jsonMapper.readValue(StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent())), ServiceLinkedUser.class);
-                return true;
+            return getJson(new URLBuilder("api/services/" + serviceId + "/links/ref/").path(userRef, true).toString(), ServiceLink.class);
+        } catch (HttpException e) {
+            if (e.getStatusCode() == 404) {
+                return null;
             } else {
-                throw new IOException("Server returned " + response.getStatusLine());
+                throw e;
             }
-        } finally {
-            req.releaseConnection();
         }
     }
 
@@ -229,10 +223,9 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl) throws IOException {
-        String url = new URLBuilder("api/services/" + serviceId + "/notifications/authentication")
-                .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).toString();
-        final String jsonOpRes = post(url, null);
-        return jsonMapper.readValue(jsonOpRes, OperationResult.class);
+        return postJson(new URLBuilder("api/notifications/authentication").param("serviceId", serviceId)
+                        .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).toString(), null,
+                OperationResult.class);
     }
 
     /**
@@ -243,17 +236,14 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public AuthenticationStatus getAuthenticationStatus(@NotNull String opId) throws IOException {
-        return jsonMapper.readValue(get("api/notifications/authentication/" + opId), AuthenticationStatus.class);
+        return getJson("api/notifications/authentication/" + opId, AuthenticationStatus.class);
     }
 
     /**
      * Request for a user to approve an operation using IDVKey
      *
      * @param serviceId       serviceId
-     * @param userRef         User ref
-     * @param redirectUrl     URL to redirect browser once the operation has been handled by the user (or if it expired).
-     * @param cancelUrl       URL to redirect browser if the user wants to cancel the operation.
-     * @param approvalRequest Approval request details  @return Operation results
+     * @param approvalRequest Approval request details
      * @return operation result
      * @throws IOException If an error occurs while performing the operation
      */
@@ -266,8 +256,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        final String json = postJson("api/services/" + serviceId + "/notifications/approval", approvalRequest);
-        return jsonMapper.readValue(json, OperationResult.class);
+        return postJson(new URLBuilder("api/notifications/approval").param("serviceId", serviceId).toString(), approvalRequest, OperationResult.class);
     }
 
     /**
@@ -304,14 +293,28 @@ public class IDVKeyAPIClient {
     }
 
     protected String get(String path) throws IOException {
+        return exec(new HttpGet(buildUrl(path)));
+    }
+
+    protected String delete(String path) throws IOException {
+        return exec(new HttpDelete(buildUrl(path)));
+    }
+
+    protected <X> X getJson(String path, Class<X> expectedJsonReturnClass) throws IOException {
         final HttpGet req = new HttpGet(buildUrl(path));
-        return exec(req);
+        return jsonMapper.readValue(exec(req), expectedJsonReturnClass);
     }
 
     protected String postJson(String path, Object obj) throws IOException {
         final HttpPost post = new HttpPost(buildUrl(path));
         post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
         return exec(post);
+    }
+
+    protected <X> X postJson(String path, Object obj, Class<X> expectedJsonReturnClass) throws IOException {
+        final HttpPost post = new HttpPost(buildUrl(path));
+        post.setEntity(new ByteArrayEntity(jsonMapper.writeValueAsBytes(obj), ContentType.APPLICATION_JSON));
+        return jsonMapper.readValue(exec(post), expectedJsonReturnClass);
     }
 
     protected String post(String path, String string) throws IOException {
@@ -338,7 +341,7 @@ public class IDVKeyAPIClient {
     }
 
     private URLBuilder url(String path) {
-        return new URLBuilder(serverUrl).addPath(path);
+        return new URLBuilder(serverUrl).path(path);
     }
 
     private URI buildUrl(String path) {
@@ -349,11 +352,7 @@ public class IDVKeyAPIClient {
         return linkUrlUrlBuilder(serviceId, userRef).toUri();
     }
 
-    private URI linkUserUrl(String serviceId, String userRef, URL redirectUrl, URL cancelUrl) {
-        return linkUrlUrlBuilder(serviceId, userRef).add("redirectUrl", redirectUrl.toString()).add("cancelUrl", cancelUrl.toString()).toUri();
-    }
-
     private URLBuilder linkUrlUrlBuilder(String serviceId, String userRef) {
-        return url("api/services/" + serviceId + "/linked").add("userRef", userRef);
+        return url("api/services/" + serviceId + "/links/ref/").path(userRef);
     }
 }

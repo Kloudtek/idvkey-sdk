@@ -19,4 +19,12 @@ public class HttpException extends IOException {
         this.reasonPhrase = reasonPhrase;
         this.statusCode = statusCode;
     }
+
+    public String getReasonPhrase() {
+        return reasonPhrase;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
 }

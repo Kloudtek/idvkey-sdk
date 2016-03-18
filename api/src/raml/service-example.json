@@ -1,0 +1,18 @@
+[
+  {
+    "id": "6KQYH6ELGNETXOXLQOX57NDIQU",
+    "name": "My Website",
+    "website": "http://www.mywebsite.com",
+    "suggestedSecurityLevel": "STANDARD",
+    "created": "2016-03-17T19:58:47.200+0000",
+    "lastUpdated": "2016-03-17T19:58:47.200+0000"
+  },
+  {
+    "id": "ASDFJDFSUJI8ASDF2ASDFJI54A",
+    "name": "My other website",
+    "website": "http://www.myotherwebsite.com",
+    "suggestedSecurityLevel": "STANDARD",
+    "created": "2016-03-17T20:58:47.200+0000",
+    "lastUpdated": "2016-03-17T20:58:47.200+0000"
+  }
+]
