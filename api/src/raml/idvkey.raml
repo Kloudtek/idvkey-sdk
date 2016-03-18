@@ -44,14 +44,20 @@ mediaType:  application/json
             description: User ref already associated with a user
           404:
             description: Service does not exist
-      get:
-        description: Check the status of a link operation request
-          queryParameters:
-            opId:
-              description: The opId that was returned in the linking request operation
-        responses:
-          200:
-            description: Returns
+      /requests/{opId}
+        get:
+          description: Check the status of a link operation request
+            queryParameters:
+              opId:
+                description: The opId that was returned in the linking request operation
+          responses:
+            200:
+              description: Returns the request state
+              body:
+                text/plain:
+                  enum: [ "PENDING", "ACCEPTED", "DENIED" ]
+            404:
+              description: Service or link request not found
       /ref/{userRef}:
         get:
           description: Get a user's link state using it's userRef

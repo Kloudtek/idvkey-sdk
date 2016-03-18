@@ -195,6 +195,33 @@ public class IDVKeyAPIClient {
      * the redirectUrl you specified in {@link #linkUser(String, URL, String, URL)}.
      *
      * @param serviceId Website serviceId
+     * @param opId      Operation id
+     * @return Service link details or null if no service link with that userRef was found.
+     * @throws IOException If error occurred performing the operation
+     */
+    public ServiceLinkRequestStatus getServiceLinkRequestStatus(String serviceId, String opId) throws IOException {
+        try {
+            String statusStr = get(new URLBuilder("api/services/" + serviceId + "/links/requests/").path(opId, true).toString());
+            try {
+                return ServiceLinkRequestStatus.valueOf(statusStr);
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Server returned invalid status value: " + statusStr);
+            }
+        } catch (HttpException e) {
+            if (e.getStatusCode() == 404) {
+                return null;
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Check if a user has been linked against your website.
+     * Use this to verify the user has been successfully linked to your website/service after he's been redirected to
+     * the redirectUrl you specified in {@link #linkUser(String, URL, String, URL)}.
+     *
+     * @param serviceId Website serviceId
      * @param userRef   User reference (generally the user's username on your website)
      * @return Service link details or null if no service link with that userRef was found.
      * @throws IOException If error occurred performing the operation
