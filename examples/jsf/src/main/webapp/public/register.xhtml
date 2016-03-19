@@ -22,23 +22,33 @@
         <div id="menu">
             <ul>
                 <li class="current_page_item"><a href="#">Home</a></li>
-                <li><h:link outcome="index.xhtml" value="Logout"/></li>
             </ul>
         </div>
         <div id="page">
             <div id="content">
-                <div id="banner"><img src="images/img07.jpg" alt="" /></div>
-                <h:form>
-                    <p:fieldset legend="Request task to be executed">
-                        <div>
-                            <p:watermark for="taskdetails" value="Task details"/>
-                            <p:inputText id="taskdetails" value="#{requestTask.details}"/>
-                        </div>
-                        <div class="martop">
-                            <p:commandButton value="Submit" actionListener="#{requestTask.submit}" ajax="false"/>
-                        </div>
-                    </p:fieldset>
+                <div id="banner"><img src="../images/img07.jpg" alt=""/></div>
+                <div>
+                    register user
+                </div>
+                <h:form prependId="false">
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <h:outputText value="Username:"/>
+                        <h:inputText id="username" value="#{registerUser.username}" required="true"/>
+                        <h:outputText value="Password:"/>
+                        <h:inputSecret id="password" value="#{registerUser.password}" required="true"/>
+                        <h:outputText value="Confirm Password:"/>
+                        <h:inputSecret id="confirmpassword" value="#{registerUser.confirmPassword}" required="true"/>
+                    </h:panelGrid>
+                    <div>
+                        <p:messages autoUpdate="true"/>
+                    </div>
+                    <div>
+                        <p:commandButton value="Register" action="#{registerUser.register}" ajax="false" validateClient="true"/>
+                    </div>
                 </h:form>
+                <div style="margin-top: 10px">
+                    <h:link outcome="register">Register new user</h:link>
+                </div>
                 <div style="clear: both;">&nbsp;</div>
             </div>
             <!-- end #content -->
@@ -46,7 +56,9 @@
                 <ul>
                     <li>
                         <h2>Veroeros sit dolore</h2>
-                        <p><strong>Donec turpis orci</strong> facilisis et ornare eget, sagittis eu massa. Quisque dui diam, euismod et lobortis sed etiam lorem ipsum dolor etiam nullam et faucibus. <a href="#">More&#8230;</a></p>
+                        <p>
+                            <strong>Donec turpis orci</strong> facilisis et ornare eget, sagittis eu massa. Quisque dui diam, euismod et lobortis sed etiam lorem ipsum dolor etiam nullam et faucibus.
+                            <a href="#">More&#8230;</a></p>
                     </li>
                     <li>
                         <h2>Categories</h2>
@@ -71,7 +83,9 @@
     <div id="footer-content">
         <div class="column1">
             <h2>Volutpat quisque sed et aliquam</h2>
-            <p><strong>Maecenas ut ante</strong> eu velit laoreet tempor accumsan vitae nibh. Aenean commodo, tortor eu porta convolutpat elementum. Proin fermentum molestie erat eget vehicula. Aenean eget tellus mi. Fusce scelerisque odio quis ante bibendum sollicitudin. Suspendisse potenti. Vivamus quam odio, facilisis at ultrices nec, sollicitudin ac risus. Donec ut odio ipsum, sed tincidunt. <a href="#">Learn more&#8230;</a></p>
+            <p>
+                <strong>Maecenas ut ante</strong> eu velit laoreet tempor accumsan vitae nibh. Aenean commodo, tortor eu porta convolutpat elementum. Proin fermentum molestie erat eget vehicula. Aenean eget tellus mi. Fusce scelerisque odio quis ante bibendum sollicitudin. Suspendisse potenti. Vivamus quam odio, facilisis at ultrices nec, sollicitudin ac risus. Donec ut odio ipsum, sed tincidunt.
+                <a href="#">Learn more&#8230;</a></p>
         </div>
         <div class="column2">
             <ul class="list">
@@ -84,7 +98,8 @@
         </div>
     </div>
     <div id="footer">
-        <p> (c) 2015 Kloudtek. Design by <a href="http://www.nodethirtythree.com">nodethirtythree</a> and <a href="http://www.freecsstemplates.org">Free CSS Templates</a>.</p>
+        <p> (c) 2015 Kloudtek. Design by <a href="http://www.nodethirtythree.com">nodethirtythree</a> and <a
+                href="http://www.freecsstemplates.org">Free CSS Templates</a>.</p>
     </div>
 </h:body>
 </html>

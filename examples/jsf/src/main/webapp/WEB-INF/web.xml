@@ -17,7 +17,7 @@
 
     <error-page>
         <error-code>500</error-code>
-        <location>/error.xhtml</location>
+        <location>/public/error.xhtml</location>
     </error-page>
 
     <!-- JSF -->

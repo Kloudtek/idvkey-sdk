@@ -17,6 +17,7 @@
         <module>simulator</module>
         <module>api</module>
         <module>examples/jsf</module>
+        <module>examples/java</module>
     </modules>
     <description>IDVKey Software Development Kit</description>
     <url>https://github.com/Kloudtek/idvkey-sdk</url>

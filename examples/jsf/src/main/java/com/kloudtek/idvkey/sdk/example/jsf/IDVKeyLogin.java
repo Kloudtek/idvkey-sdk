@@ -38,7 +38,7 @@ public class IDVKeyLogin implements Serializable {
 
     public void login() throws IOException {
         final OperationResult operationResult = apiClient.authenticateUser(websiteId,
-                new URL(JSFUtils.getContextURL("/rest/verifyauth")), new URL(JSFUtils.getContextURL("/index.xhtml")));
+                new URL(JSFUtils.getContextURL("/rest/verifyauth")), new URL(JSFUtils.getContextURL("/login.xhtml")));
         // since this bean is session scoped, this will be available later in the verifyAuth call below
         authOpId = operationResult.getOpId();
         JSFUtils.getExternalContext().redirect(operationResult.getRedirectUrl().toString());
@@ -52,7 +52,7 @@ public class IDVKeyLogin implements Serializable {
         model.addAttribute("attribute", "redirectWithRedirectPrefix");
         if( user != null ) {
             userCtx.setUser(user);
-            return new ModelAndView("redirect:/loggedin.xhtml", model);
+            return new ModelAndView("redirect:/index.xhtml", model);
         } else {
             return new ModelAndView("redirect:/linkidvkey.xhtml", model);
         }

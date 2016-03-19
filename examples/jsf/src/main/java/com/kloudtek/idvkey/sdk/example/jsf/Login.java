@@ -50,7 +50,7 @@ public class Login {
     public String login() {
         final User user = userDb.findUser(username);
         if (user != null && user.comparePassword(password)) {
-            return "loggedin.xhtml";
+            return "index.xhtml";
         } else {
             JSFUtils.addErrorMessage(null, "Invalid username / password");
             return null;
