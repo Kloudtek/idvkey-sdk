@@ -38,7 +38,7 @@ public class APIKeyBundle implements Serializable {
     }
 
     @JsonIgnore
-    public HMACKey getHMACKey() throws InvalidKeyException {
+    public HMACKey hmacKey() throws InvalidKeyException {
         if (type != KeyType.HMAC_SHA256) {
             throw new IllegalArgumentException("Key is not an HMAC_SHA256 Key: " + type.name());
         }
