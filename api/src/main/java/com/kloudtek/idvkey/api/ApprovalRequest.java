@@ -12,16 +12,15 @@ import java.net.URL;
 /**
  * Used to request a confirmation from a user
  */
-public class ApprovalRequest {
-    @JsonProperty
+public class ApprovalRequest extends AbstractNotificationRequest {
+    @JsonProperty(required = true)
+    @javax.validation.constraints.NotNull
     private String userRef;
-    @JsonProperty
-    private URL redirectUrl;
-    @JsonProperty
-    private URL cancelUrl;
-    @JsonProperty
+    @JsonProperty(required = true)
+    @javax.validation.constraints.NotNull
     private String title;
-    @JsonProperty
+    @JsonProperty(required = true)
+    @javax.validation.constraints.NotNull
     private String text;
     @JsonProperty
     private boolean centeredHorizontal = true;
@@ -39,38 +38,23 @@ public class ApprovalRequest {
     public ApprovalRequest() {
     }
 
-    public ApprovalRequest(@NotNull String userRef, @NotNull URL redirectUrl, @NotNull URL cancelUrl, @NotNull String title, @NotNull String text) {
+    public ApprovalRequest(@NotNull String serviceId, @NotNull String userRef, @NotNull URL redirectUrl, @NotNull URL cancelUrl, @NotNull String title, @NotNull String text) {
+        super(serviceId, redirectUrl, cancelUrl);
         this.userRef = userRef;
-        this.redirectUrl = redirectUrl;
-        this.cancelUrl = cancelUrl;
         this.title = title;
         this.text = text;
     }
 
+    @NotNull
     public String getUserRef() {
         return userRef;
     }
 
-    public void setUserRef(String userRef) {
+    public void setUserRef(@NotNull String userRef) {
         this.userRef = userRef;
     }
 
-    public URL getRedirectUrl() {
-        return redirectUrl;
-    }
-
-    public void setRedirectUrl(URL redirectUrl) {
-        this.redirectUrl = redirectUrl;
-    }
-
-    public URL getCancelUrl() {
-        return cancelUrl;
-    }
-
-    public void setCancelUrl(URL cancelUrl) {
-        this.cancelUrl = cancelUrl;
-    }
-
+    @NotNull
     public String getTitle() {
         return title;
     }
@@ -79,6 +63,7 @@ public class ApprovalRequest {
         this.title = title;
     }
 
+    @NotNull
     public String getText() {
         return text;
     }

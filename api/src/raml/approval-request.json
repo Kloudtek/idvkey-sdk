@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "serviceId": {
+      "type": "string",
+      "description": "Website/service id"
+    },
+    "userRef": {
+      "type": "string",
+      "description": "User reference"
+    },
+    "redirectUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to redirect user to after he's been authenticated"
+    },
+    "cancelUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to redirect user if he cancels the approval operation"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title for the approval"
+    },
+    "text": {
+      "type": "string",
+      "description": "Approval text"
+    },
+    "centeredHorizontal": {
+      "type": "boolean",
+      "description": "Indicate if the text should be centered horizontally in the screen",
+      "default": true
+    },
+    "centeredVertical": {
+      "type": "boolean",
+      "description": "Indicate if the text should be centered vertically in the screen",
+      "default": true
+    },
+    "denyConfirmMsg": {
+      "type": "string",
+      "description": "If this is set and the user attempts to deny the approval, this text will be displayed and the user requested to confirm the denial"
+    },
+    "approveConfirmMsg": {
+      "type": "string",
+      "description": "If this is set and the user attempts to deny the approval, this text will be displayed and the user requested to confirm the approval"
+    },
+    "denyMsg": {
+      "type": "string",
+      "description": "If this is set and the user denies the request, the user will be displayed this message"
+    },
+    "approveMsg": {
+      "type": "string",
+      "description": "If this is set and the approves the request, the user will be displayed this message"
+    }
+  },
+  "required": [
+    "serviceId",
+    "userRef",
+    "redirectUrl",
+    "cancelUrl",
+    "title",
+    "text"
+  ]
+}

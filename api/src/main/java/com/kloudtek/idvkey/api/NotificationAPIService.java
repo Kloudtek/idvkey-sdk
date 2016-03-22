@@ -4,6 +4,8 @@
 
 package com.kloudtek.idvkey.api;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 
 /**
@@ -11,13 +13,11 @@ import javax.ws.rs.*;
  */
 @Path("/notifications")
 public interface NotificationAPIService {
-
     @POST
     @Path("authentication")
     @AuthenticateCustomer
     @Produces("application/json")
-    OperationResult requestAuthentication(@QueryParam("serviceId") String serviceId, @QueryParam("redirectUrl") String redirectUrl,
-                                          @QueryParam("cancelUrl") String cancelUrl);
+    OperationResult requestAuthentication(@NotNull @Valid AuthenticationRequest authenticationRequest);
 
     /**
      * Get the user ref for the user authenticated with that operation id
@@ -29,18 +29,18 @@ public interface NotificationAPIService {
     @Path("authentication/{opId}")
     @Produces("application/json")
     @AuthenticateCustomer
-    AuthenticationStatus confirmUserAuthentication(@PathParam("opId") String opId);
+    AuthenticationStatus getAuthenticationStatus(@NotNull @PathParam("opId") String opId);
 
     @POST
     @Path("approval")
     @AuthenticateCustomer
     @Consumes("application/json")
     @Produces("application/json")
-    OperationResult requestApproval(@QueryParam("serviceId") String serviceId, ApprovalRequest req);
+    OperationResult requestApproval(@NotNull @QueryParam("serviceId") String serviceId, @NotNull @Valid ApprovalRequest req);
 
     @GET
     @Path("approval/{opId}")
     @AuthenticateCustomer
     @Produces("text/plain")
-    ApprovalState getUserApprovalState(@PathParam("opId") String opId);
+    ApprovalState getUserApprovalState(@NotNull @PathParam("opId") String opId);
 }

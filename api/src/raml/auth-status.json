@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "replied": {
+      "type": "boolean",
+      "description": "Indicates if the user has replied to the authentication request"
+    },
+    "approved": {
+      "type": "boolean",
+      "description": "Indicates if the user has approved authentication or not (will only be present when replied is true)"
+    },
+    "userRef": {
+      "type": "string",
+      "description": "User ref as assigned in service link (will only be present when replied is true)"
+    }
+  },
+  "required": [
+    "replied"
+  ]
+}

@@ -46,7 +46,11 @@ public class IDVKeyAPIClient {
     public static final String IDVKEY_URL = "https://api.idvkey.com";
     protected CloseableHttpClient httpClient;
     protected String serverUrl;
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
+    private static final ObjectMapper jsonMapper;
+
+    static {
+        jsonMapper = new ObjectMapper();
+    }
 
     /**
      * Constructor
@@ -250,8 +254,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If error occurred performing the operation
      */
     public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl) throws IOException {
-        return postJson(new URLBuilder("api/notifications/authentication").param("serviceId", serviceId)
-                        .param("redirectUrl", redirectUrl.toString()).param("cancelUrl", cancelUrl.toString()).toString(), null,
+        return postJson("api/notifications/authentication", new AuthenticationRequest(serviceId, redirectUrl, cancelUrl),
                 OperationResult.class);
     }
 
@@ -269,13 +272,12 @@ public class IDVKeyAPIClient {
     /**
      * Request for a user to approve an operation using IDVKey
      *
-     * @param serviceId       serviceId
      * @param approvalRequest Approval request details
      * @return operation result
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
-    public OperationResult requestApproval(@NotNull String serviceId, @NotNull ApprovalRequest approvalRequest) throws IOException {
+    public OperationResult requestApproval(@NotNull ApprovalRequest approvalRequest) throws IOException {
         if (approvalRequest == null) {
             throw new IllegalArgumentException("approval request missing");
         } else if (StringUtils.isBlank(approvalRequest.getTitle())) {
@@ -283,7 +285,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        return postJson(new URLBuilder("api/notifications/approval").param("serviceId", serviceId).toString(), approvalRequest, OperationResult.class);
+        return postJson(new URLBuilder("api/notifications/approval").toString(), approvalRequest, OperationResult.class);
     }
 
     /**

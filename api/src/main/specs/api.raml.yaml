@@ -1,5 +1,0 @@
-#%RAML 0.8
-title: IDVKey API
-version: 1
-baseUri: https://www.idvkey.com/api
-/:

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "serviceId": {
+      "type": "string",
+      "description": "Website/service id"
+    },
+    "redirectUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to redirect user to after he's been authenticated"
+    },
+    "cancelUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to redirect user if he cancels the approval operation"
+    }
+  },
+  "required": [
+    "serviceId",
+    "redirectUrl",
+    "cancelUrl"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "serviceId": "ASDFJDFSUJI8ASDF2ASDFJI54A",
+  "userRef": "my-user-ref",
+  "redirectUrl": "https://mysite.com/public/mywebsite",
+  "cancelUrl": "https://mysite.com/public/cancelUrl",
+  "title": "Approve transfer",
+  "text": "Please confirm transfer of 2000 USD from account 328497298347 to account 54723234234"
+}

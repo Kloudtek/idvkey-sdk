@@ -44,18 +44,17 @@ mediaType:  application/json
             description: User ref already associated with a user
           404:
             description: Service does not exist
-      /requests/{opId}
+      /requests/{opId}:
         get:
           description: Check the status of a link operation request
-            queryParameters:
-              opId:
-                description: The opId that was returned in the linking request operation
+          queryParameters:
+            opId:
+              description: The opId that was returned in the linking request operation
           responses:
             200:
-              description: Returns the request state
+              description: "Returns the request state, which will be either: PENDING, ACCEPTED or DENIED"
               body:
                 text/plain:
-                  enum: [ "PENDING", "ACCEPTED", "DENIED" ]
             404:
               description: Service or link request not found
       /ref/{userRef}:
@@ -84,18 +83,17 @@ mediaType:  application/json
   /authentication:
     post:
       description: Request user authentication
-      queryParameters:
-        serviceId:
-          description: Service id
-        redirectUrl:
-          description: URL to redirect user to after he's successfully approved linking
-        cancelUrl:
-          description: URL to redirect user if he decides to deny the link
+      body:
+        application/json:
+          schema: !include auth-request.json
+          example: !include auth-request-example.json
       responses:
         200:
+          description: Returns the operation id and the url where the user browser should be redirected to in order to complete the operation.
           body:
-            text/plain:
-              description: operation id (opId) that will be used to check the status on the request
+            application/json:
+              schema: !include operationResult.json
+              example: !include operationResult-example.json
         404:
           description: service not found
     /{opId}:
@@ -105,6 +103,8 @@ mediaType:  application/json
           200:
             body:
               application/json:
+                schema: !include auth-status.json
+                example: !include auth-status-example.json
           404:
             description: authentication or service not found
             body:
@@ -113,14 +113,17 @@ mediaType:  application/json
   /approval:
     post:
       description: Request user approval
-      queryParameters:
-        serviceId:
-          description: Service id
+      body:
+        application/json:
+          schema: !include approval-request.json
+          example: !include approval-request-example.json
       responses:
         200:
+          description: Request submitted successfully. returns operation id and the url where the user browser should be redirected to in order to complete the operation.
           body:
-            text/plain:
-              description: operation id (opId) that will be used to check the status on the request
+            application/json:
+              schema: !include operationResult.json
+              example: !include operationResult-example.json
         404:
           description: service not found
     /{opId}:
@@ -128,11 +131,10 @@ mediaType:  application/json
         description: Retrieve the approval's status
         responses:
           200:
+            description: "returns one of the following values: PENDING, APPROVED, DENIED"
             body:
               text/plain:
-                description: one of the following values PENDING, APPROVED, DENIED
           404:
-            description: notification not found
+            description: notification not found, error details included in body
             body:
               text/plain:
-                description: Error details

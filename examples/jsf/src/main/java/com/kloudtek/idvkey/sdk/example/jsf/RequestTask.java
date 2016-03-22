@@ -36,9 +36,9 @@ public class RequestTask implements Serializable {
     private HashMap<String, String> pendingOperations = new HashMap<String, String>();
 
     public void submit() throws IOException {
-        ApprovalRequest approvalRequest = new ApprovalRequest(userCtx.getLinkedUserRef(), new URL(JSFUtils.getContextURL("/dorequesttask.xhtml")),
+        ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userCtx.getLinkedUserRef(), new URL(JSFUtils.getContextURL("/dorequesttask.xhtml")),
                 new URL(JSFUtils.getContextURL("/dorequesttask.xhtml?cancel=true")), "Confirm operation", details);
-        OperationResult operationResult = apiClient.requestApproval(websiteId, approvalRequest);
+        OperationResult operationResult = apiClient.requestApproval(approvalRequest);
         opId = operationResult.getOpId();
         pendingOperations.put(opId, details);
         JSFUtils.getExternalContext().redirect(operationResult.getRedirectUrl().toString());
