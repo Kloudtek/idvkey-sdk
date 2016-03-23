@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright (c) 2016 Kloudtek Ltd
+  -->
+
+<project name="IDVKey APIs and SDK" xmlns="http://maven.apache.org/DECORATION/1.7.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.7.0 http://maven.apache.org/xsd/decoration-1.7.0.xsd">
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.5</version>
+    </skin>
+    <custom>
+        <fluidoSkin>
+            <sideBarEnabled>false</sideBarEnabled>
+            <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+            <gitHub>
+                <projectId>Kloudtek/idvkey-sdk</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>black</ribbonColor>
+            </gitHub>
+            <topBarEnabled>true</topBarEnabled>
+            <topBarIcon>
+                <name>IDVKey</name>
+                <src>https://www.idvkey.com/logo-light.png</src>
+                <href>/index.html</href>
+            </topBarIcon>
+            <skipGenerationDate>true</skipGenerationDate>
+            <googleSearch>
+                <sitesearch/>
+            </googleSearch>
+        </fluidoSkin>
+        <div>
+            SDAFFDSAFDSAFDSAFSDAFDSA
+        </div>
+    </custom>
+    <publishDate position="none"/>
+    <version position="none"/>
+    <body>
+        <links>
+            <item name="IDVKey Portal" href="https://portal.idvkey.com"/>
+            <item name="IDVKey Website" href="https://www.idvkey.com"/>
+            <item name="Contact Us" href="https://www.idvkey.com/contactus.html"/>
+        </links>
+        <breadcrumbs>
+            <item name="Home" href="index.html"/>
+        </breadcrumbs>
+        <menu ref="modules"/>
+        <menu ref="reports"/>
+    </body>
+</project>

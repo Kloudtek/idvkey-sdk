@@ -14,8 +14,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>idvkey-sdk-api</artifactId>
-    <name>IDVKey SDK API</name>
+    <name>IDVKey Cloud API</name>
     <version>1.0-SNAPSHOT</version>
+    <description>Specifications and documentation for the IDVKey API Services</description>
 
     <dependencies>
         <dependency>
@@ -55,30 +56,48 @@
 
     <build>
         <plugins>
-            <!--
-                        <plugin>
-                            <groupId>org.raml.plugins</groupId>
-                            <artifactId>jaxrs-raml-maven-plugin</artifactId>
-                            <version>1.3.4</version>
-                            <configuration>
-                                <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-                                <outputFile>${basedir}/target/generated-sources/jaxrs-raml/tests1/api.raml</outputFile>
-                                <basePackageName>com.kloudtek.idvkey.api</basePackageName>
-                                <jaxrsVersion>2.0</jaxrsVersion>
-                                <useJsr303Annotations>true</useJsr303Annotations>
-                                <jsonMapper>jackson2</jsonMapper>
-                                <removeOldOutput>true</removeOldOutput>
-                            </configuration>
-                            <executions>
-                                <execution>
-                                    <goals>
-                                        <goal>generate-raml</goal>
-                                    </goals>
-                                    <phase>test</phase>
-                                </execution>
-                            </executions>
-                        </plugin>
-            -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.directory}/site/raml"/>
+                                <copy todir="${project.build.directory}/site/raml" filtering="true">
+                                    <fileset dir="${project.basedir}/src/raml/"/>
+                                    <filterset>
+                                        <filter token="version" value="${project.version}"/>
+                                    </filterset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <executable>raml2html</executable>
+                    <arguments>
+                        <argument>${project.build.directory}/site/raml/idvkey.raml</argument>
+                    </arguments>
+                    <outputFile>${project.build.directory}/site/idvkey-raml.html</outputFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -17,7 +17,7 @@ public interface NotificationAPIService {
     @Path("authentication")
     @AuthenticateCustomer
     @Produces("application/json")
-    OperationResult requestAuthentication(@NotNull @Valid AuthenticationRequest authenticationRequest);
+    OperationResult requestAuthentication(@Valid AuthenticationRequest authenticationRequest);
 
     /**
      * Get the user ref for the user authenticated with that operation id
@@ -36,7 +36,7 @@ public interface NotificationAPIService {
     @AuthenticateCustomer
     @Consumes("application/json")
     @Produces("application/json")
-    OperationResult requestApproval(@NotNull @QueryParam("serviceId") String serviceId, @NotNull @Valid ApprovalRequest req);
+    OperationResult requestApproval(@Valid ApprovalRequest req);
 
     @GET
     @Path("approval/{opId}")

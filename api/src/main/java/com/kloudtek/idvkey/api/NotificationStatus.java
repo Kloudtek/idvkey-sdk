@@ -5,12 +5,10 @@
 package com.kloudtek.idvkey.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Created by yannick on 16/3/16.
  */
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class NotificationStatus {
     @JsonProperty(required = true)
     protected boolean replied;

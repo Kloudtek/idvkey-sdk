@@ -18,9 +18,10 @@
         <module>api</module>
         <module>examples/jsf</module>
     </modules>
-    <description>IDVKey Software Development Kit</description>
     <url>https://github.com/Kloudtek/idvkey-sdk</url>
-    <name>IDVKey SDK</name>
+    <name>IDVKey developer docs</name>
+    <description>Here you'll find specifications and documentation for integration your websites/services with IDVKey
+    </description>
     <organization>
         <name>Kloudtek</name>
         <url>http://www.kloudtek.com</url>
@@ -120,6 +121,10 @@
             </plugin>
         </plugins>
     </build>
+    <reporting>
+        <plugins>
+        </plugins>
+    </reporting>
     <repositories>
         <repository>
             <id>ossrh-releases</id>
@@ -134,6 +139,11 @@
         </repository>
     </repositories>
     <distributionManagement>
+        <site>
+            <id>idvkeysdk.site</id>
+            <name>IDVKey SDK Website</name>
+            <url>https://www.idvkey.com/sdk</url>
+        </site>
         <repository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
