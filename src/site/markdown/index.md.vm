@@ -6,6 +6,4 @@
     <title>About</title>
 </head>
 
-$h1 Welcome to ${project.name}
-
-Lorem ipsem dolor sit amet...
+In order to allow you to integrate your website / service with IDVKey's capabilities, we provide
