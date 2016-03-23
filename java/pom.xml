@@ -14,7 +14,7 @@
     </parent>
     <artifactId>idvkey-sdk-java</artifactId>
     <name>IDVKey SDK: Java</name>
-    <description>Java SDK allowing to interact with IDVKey API services</description>
+    <description>This Java SDK will allow you very to easily integrate your Java application with IDVKey</description>
 
     <dependencies>
         <dependency>

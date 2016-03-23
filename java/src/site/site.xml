@@ -3,9 +3,13 @@
   ~ Copyright (c) 2016 Kloudtek Ltd
   -->
 
-<project name="IDVKey APIs and SDK">
+<project name="Java SDK">
+    <version position="right"/>
     <body>
-        <menu ref="parent"/>
+        <breadcrumbs>
+            <item name="Java SDK" href="index.html"/>
+        </breadcrumbs>
+        <menu ref="modules"/>
         <menu ref="reports"/>
     </body>
 </project>
