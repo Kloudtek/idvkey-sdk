@@ -18,7 +18,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.kloudtek.idvkey.sdk</groupId>
+            <groupId>com.kloudtek.idvkey</groupId>
             <artifactId>idvkey-api</artifactId>
             <version>0.9-SNAPSHOT</version>
         </dependency>
