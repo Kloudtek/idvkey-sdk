@@ -15,7 +15,6 @@
     <modules>
         <module>java</module>
         <module>simulator</module>
-        <module>api</module>
         <module>examples/jsf</module>
     </modules>
     <url>https://github.com/Kloudtek/idvkey-sdk</url>
@@ -130,6 +129,17 @@
             <id>ossrh-releases</id>
             <name>OSS Sonatype</name>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ossrh-snapshots</id>
+            <name>OSS Sonatype</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
