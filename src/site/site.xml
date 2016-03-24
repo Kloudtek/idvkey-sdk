@@ -41,10 +41,10 @@
             <item name="Contact Us" href="https://www.idvkey.com/contactus.html"/>
         </links>
         <breadcrumbs>
-            <item name="Home" href="index.html"/>
+            <item name="Home" href="http://www.idvkey.com/support/index.html"/>
         </breadcrumbs>
         <menu name="SDKs">
-            <item name="Java" href="idvkey-sdk-java/index.html"/>
+            <item name="Java" href="http://www.idvkey.com/support/idvkey-sdk-java/index.html"/>
         </menu>
         <menu name="Docs &amp; Tools">
             <item name="API specs &amp; docs" href="http://www.idvkey.com/support/api/index.html"/>

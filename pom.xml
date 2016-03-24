@@ -127,10 +127,6 @@
             </extension>
         </extensions>
     </build>
-    <reporting>
-        <plugins>
-        </plugins>
-    </reporting>
     <repositories>
         <repository>
             <id>ossrh-releases</id>
