@@ -154,7 +154,7 @@
     <distributionManagement>
         <site>
             <id>idvkey.site</id>
-            <url>s3://www.idvkey.com/support/api</url>
+            <url>s3://www.idvkey.com/support</url>
         </site>
         <repository>
             <id>ossrh</id>
