@@ -4,6 +4,7 @@
 
 package com.kloudtek.idvkey.sdk.example.jsf;
 
+import com.kloudtek.idvkey.api.AuthenticationStatus;
 import com.kloudtek.idvkey.api.OperationResult;
 import com.kloudtek.idvkey.sdk.IDVKeyAPIClient;
 import com.kloudtek.util.JSFUtils;
@@ -37,8 +38,9 @@ public class IDVKeyLogin implements Serializable {
     private String idvkeyId;
 
     public void login() throws IOException {
-        final OperationResult operationResult = apiClient.authenticateUser(websiteId,
-                new URL(JSFUtils.getContextURL("/rest/verifyauth")), new URL(JSFUtils.getContextURL("/login.xhtml")));
+        URL callbackUrl = new URL(JSFUtils.getContextURL("/rest/verifyauth"));
+        URL cancelUrl = new URL(JSFUtils.getContextURL("/login.xhtml"));
+        final OperationResult operationResult = apiClient.authenticateUser(websiteId, callbackUrl, cancelUrl);
         // since this bean is session scoped, this will be available later in the verifyAuth call below
         authOpId = operationResult.getOpId();
         JSFUtils.getExternalContext().redirect(operationResult.getRedirectUrl().toString());
@@ -47,7 +49,8 @@ public class IDVKeyLogin implements Serializable {
     @RequestMapping("/verifyauth")
     public ModelAndView verifyAuth(ModelMap model) throws IOException {
         // let's verify the user has authenticated successfully before setting him/her as authenticated.
-        idvkeyId = apiClient.getAuthenticationStatus(authOpId).getUserRef();
+        AuthenticationStatus status = apiClient.getAuthenticationStatus(authOpId);
+        idvkeyId = status.getUserRef();
         User user = userDb.findUserByIdvkeyId(idvkeyId);
         model.addAttribute("attribute", "redirectWithRedirectPrefix");
         if( user != null ) {

@@ -13,19 +13,13 @@
     </skin>
     <custom>
         <fluidoSkin>
-            <sideBarEnabled>false</sideBarEnabled>
-            <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
             <gitHub>
                 <projectId>Kloudtek/idvkey-sdk</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
                 <ribbonColor>black</ribbonColor>
             </gitHub>
-            <topBarEnabled>true</topBarEnabled>
-            <topBarIcon>
-                <name>IDVKey</name>
-                <src>https://www.idvkey.com/logo-light.png</src>
-                <href>/index.html</href>
-            </topBarIcon>
+            <topBarEnabled>false</topBarEnabled>
             <skipGenerationDate>true</skipGenerationDate>
             <googleSearch>
                 <sitesearch/>
@@ -41,13 +35,19 @@
             <item name="Contact Us" href="https://www.idvkey.com/contactus.html"/>
         </links>
         <breadcrumbs>
-            <item name="Home" href="http://www.idvkey.com/support/index.html"/>
+            <item name="Home" href="http://www.idvkey.com/support/dev/index.html"/>
         </breadcrumbs>
         <menu name="SDKs">
-            <item name="Java" href="http://www.idvkey.com/support/idvkey-sdk-java/index.html"/>
+            <item name="Java" href="http://www.idvkey.com/support/dev/sdk/idvkey-sdk-java/index.html"/>
+        </menu>
+        <menu name="Examples">
+            <item name="Java / JSF" href="https://github.com/Kloudtek/idvkey-sdk/tree/master/examples/jsf/index.html"/>
         </menu>
         <menu name="Docs &amp; Tools">
-            <item name="API specs &amp; docs" href="http://www.idvkey.com/support/api/index.html"/>
+            <item name="Using IDVKey APIs" href="http://www.idvkey.com/support/dev/using-apis.html"/>
+            <item name="API Security" href="http://www.idvkey.com/support/dev/api-security.html"/>
+            <item name="API Documentation" href="http://www.idvkey.com/support/dev/raml/idvkey.html"/>
+            <item name="API RAML specs" href="http://www.idvkey.com/support/dev/raml/idvkey-raml.zip"/>
         </menu>
         <menu ref="reports"/>
     </body>

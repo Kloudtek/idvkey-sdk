@@ -295,13 +295,8 @@ public class IDVKeyAPIClient {
      * @return approval state
      * @throws IOException If an error occurs while performing the operation
      */
-    public ApprovalState getApprovalState(@NotNull String opId) throws IOException {
-        final String state = get("api/notifications/approval/" + opId);
-        try {
-            return ApprovalState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new IOException("Invalid approval state: " + state);
-        }
+    public ApprovalRequestStatus getApprovalState(@NotNull String opId) throws IOException {
+        return getJson("api/notifications/approval/" + opId, ApprovalRequestStatus.class);
     }
 
     private void checkStatus(CloseableHttpResponse response) throws IOException {
