@@ -35,7 +35,8 @@
             <item name="Contact Us" href="https://www.idvkey.com/contactus.html"/>
         </links>
         <breadcrumbs>
-            <item name="Home" href="http://www.idvkey.com/support/dev/index.html"/>
+            <item name="Home" href="http://www.idvkey.com/"/>
+            <item name="Developer Support" href="http://www.idvkey.com/support/dev/index.html"/>
         </breadcrumbs>
         <menu name="SDKs">
             <item name="Java" href="http://www.idvkey.com/support/dev/sdk/idvkey-sdk-java/index.html"/>
