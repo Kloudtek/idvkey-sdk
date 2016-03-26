@@ -56,7 +56,8 @@ public class IDVKeyAPIClient {
      * Constructor
      *
      * @param keyId     Key id
-     * @param base64Key A {@link SignAndVerifyKey} key
+     * @param keyType   Type of key used
+     * @param base64Key A {@link SignAndVerifyKey} key (base64 encoded)
      * @throws InvalidKeyException if the key was invalid
      */
     public IDVKeyAPIClient(String keyId, KeyType keyType, String base64Key) throws InvalidKeyException {
@@ -67,7 +68,8 @@ public class IDVKeyAPIClient {
      * Constructor
      *
      * @param keyId   Key id
-     * @param keyData A {@link SignAndVerifyKey} key
+     * @param keyType Type of key used
+     * @param keyData A {@link SignAndVerifyKey} key (in it's default format, for example RAW in the case of HMAC)
      * @throws InvalidKeyException if the key was invalid
      */
     public IDVKeyAPIClient(String keyId, KeyType keyType, byte[] keyData) throws InvalidKeyException {
@@ -89,7 +91,7 @@ public class IDVKeyAPIClient {
     }
 
     /**
-     * Constructor (only use this to connect to IDVKey test server)
+     * Constructor (used to connect to a different API Server like a simulator for example)
      *
      * @param serverUrl Server URL
      * @param id        Key id
@@ -144,6 +146,7 @@ public class IDVKeyAPIClient {
      * Return the list of services that have been registered on IDVKey
      *
      * @return list of services
+     * @throws IOException If an error occurs contacting the server
      */
     public List<Service> getServices() throws IOException {
         return jsonMapper.readValue(get("api/services"), jsonMapper.getTypeFactory().constructCollectionType(List.class, Service.class));
@@ -158,7 +161,7 @@ public class IDVKeyAPIClient {
      * @param userRef   User reference (generally the user's username on your website)
      * @param cancelUrl URL to redirect user to should he wish to cancel the linking
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
-     * @throws IOException                If the server returned an error
+     * @throws IOException                If an error occurs contacting the server
      * @throws UserAlreadyLinkedException If the user was already linked
      * @throws ServiceNotFoundException   If the service was not found
      */
@@ -349,10 +352,9 @@ public class IDVKeyAPIClient {
         return exec(post);
     }
 
-    private String exec(HttpUriRequest req) throws IOException {
+    private String exec(HttpRequestBase req) throws IOException {
         req.setHeader("api-version", "1.0");
-        final CloseableHttpResponse response = httpClient.execute(req);
-        try {
+        try (CloseableHttpResponse response = httpClient.execute(req)) {
             checkStatus(response);
             if (response.getEntity() != null) {
                 return StringUtils.utf8(IOUtils.toByteArray(response.getEntity().getContent()));
@@ -360,7 +362,7 @@ public class IDVKeyAPIClient {
                 return null;
             }
         } finally {
-            response.close();
+            req.releaseConnection();
         }
     }
 

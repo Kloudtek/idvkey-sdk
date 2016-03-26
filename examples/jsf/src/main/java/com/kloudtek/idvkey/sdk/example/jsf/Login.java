@@ -56,4 +56,9 @@ public class Login {
             return null;
         }
     }
+
+    public String logout() {
+        JSFUtils.getHttpRequest().getSession().invalidate();
+        return "/index";
+    }
 }

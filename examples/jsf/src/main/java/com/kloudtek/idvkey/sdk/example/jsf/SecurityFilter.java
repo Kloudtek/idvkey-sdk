@@ -27,11 +27,12 @@ public class SecurityFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String path = ((HttpServletRequest) request).getServletPath();
-        if ((path.startsWith("/javax.faces.resource/") || path.startsWith("/images/") || path.startsWith("/public/")) || ctx.getBean(UserCtx.class).getUser() != null) {
+        String path = ((HttpServletRequest) request).getRequestURI();
+        if ((path.startsWith("/javax.faces.resource/") || path.startsWith("/images/") || path.startsWith("/public/")) ||
+                path.startsWith("/rest/") || ctx.getBean(UserCtx.class).getUser() != null) {
             chain.doFilter(request, response);
         } else {
-            ((HttpServletResponse) response).sendRedirect("/index.xhtml");
+            ((HttpServletResponse) response).sendRedirect("/public/login.xhtml");
         }
     }
 

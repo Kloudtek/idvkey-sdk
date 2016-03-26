@@ -40,8 +40,8 @@ public class RequestTask implements Serializable {
         String userRef = userCtx.getLinkedUserRef();
         URL callbackUrl = new URL(JSFUtils.getContextURL("/dorequesttask.xhtml"));
         URL cancelUrl = new URL(JSFUtils.getContextURL("/dorequesttask.xhtml?cancel=true"));
-        String approvalTitle = "Confirm operation";
-        String approvalText = this.details;
+        String approvalTitle = "Approve task";
+        String approvalText = "Please approve the following task\n\n" + this.details;
         ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText);
         OperationResult operationResult = apiClient.requestApproval(approvalRequest);
         opId = operationResult.getOpId();

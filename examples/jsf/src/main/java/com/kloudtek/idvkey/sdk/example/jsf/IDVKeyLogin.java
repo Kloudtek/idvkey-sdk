@@ -57,7 +57,7 @@ public class IDVKeyLogin implements Serializable {
             userCtx.setUser(user);
             return new ModelAndView("redirect:/index.xhtml", model);
         } else {
-            return new ModelAndView("redirect:/linkidvkey.xhtml", model);
+            return new ModelAndView("redirect:/public/linkidvkey.xhtml", model);
         }
     }
 

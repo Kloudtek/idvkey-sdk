@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Kloudtek Ltd
+ */
+
 package com.kloudtek.idvkey.sdk.example.jsf;
 
 import com.kloudtek.ktserializer.Serializable;
@@ -45,7 +49,7 @@ public class IDVKeyLinkUser implements Serializable {
         User user = userDb.createUser(username, password);
         user.setIdvkeyId(idvKeyLogin.getIdvkeyId());
         userCtx.setUser(user);
-        return "/loggedin";
+        return "/index";
     }
 
     public String getUsername() {

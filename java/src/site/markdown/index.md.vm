@@ -1,0 +1,15 @@
+#set($h1 = '#')
+#set($h2 = '##')
+#set($h3 = '###')
+#set($h4 = '####')
+<head>
+    <title>About</title>
+</head>
+
+The IDVKey Java SDK will allow you to very easily integrate your Java-based websites or application.
+
+You can easily [add it to your profile using your favorite dependency management tool](dependency-info.html)
+
+In order to use the SDK, all you need is to create an instance of the [IDVKeyAPIClient](apidocs/com/kloudtek/idvkey/sdk/IDVKeyAPIClient.html) class, and use it to perform any IDVKey operation.
+
+You will find an example of it's use in the [Java/JSF example website](https://github.com/Kloudtek/idvkey-sdk/tree/master/examples/jsf/index.html)
