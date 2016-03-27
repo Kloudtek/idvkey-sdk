@@ -13,13 +13,13 @@
     </skin>
     <custom>
         <fluidoSkin>
-            <sideBarEnabled>true</sideBarEnabled>
             <gitHub>
                 <projectId>Kloudtek/idvkey-sdk</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
                 <ribbonColor>black</ribbonColor>
             </gitHub>
-            <topBarEnabled>false</topBarEnabled>
+            <sideBarEnabled>false</sideBarEnabled>
+            <topBarEnabled>true</topBarEnabled>
             <skipGenerationDate>true</skipGenerationDate>
             <googleSearch>
                 <sitesearch/>
@@ -42,7 +42,8 @@
             <item name="Java" href="http://www.idvkey.com/support/dev/sdk/idvkey-sdk-java/index.html"/>
         </menu>
         <menu name="Examples">
-            <item name="Java / JSF" href="https://github.com/Kloudtek/idvkey-sdk/tree/master/examples/jsf/index.html"/>
+            <item name="Java / JSF"
+                  href="https://www.idvkey.com/support/dev/sdk/examples/idvkey-sdk-example-jsf/index.html"/>
         </menu>
         <menu name="Docs &amp; Tools">
             <item name="Using IDVKey APIs" href="http://www.idvkey.com/support/dev/using-apis.html"/>

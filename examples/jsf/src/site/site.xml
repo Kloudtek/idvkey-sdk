@@ -7,7 +7,7 @@
     <version position="right"/>
     <body>
         <breadcrumbs>
-            <item name="Java SDK" href="index.html"/>
+            <item name="Java/JSF Example" href="index.html"/>
         </breadcrumbs>
         <menu name="SDKs">
             <item name="Java" href="http://www.idvkey.com/support/dev/sdk/idvkey-sdk-java/index.html"/>
