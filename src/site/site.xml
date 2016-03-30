@@ -11,6 +11,7 @@
         <artifactId>maven-fluido-skin</artifactId>
         <version>1.5</version>
     </skin>
+    <googleAnalyticsAccountId>UA-53593691-2</googleAnalyticsAccountId>
     <custom>
         <fluidoSkin>
             <gitHub>

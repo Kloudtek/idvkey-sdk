@@ -5,6 +5,7 @@
 
 <project name="Java SDK">
     <version position="right"/>
+    <googleAnalyticsAccountId>UA-53593691-2</googleAnalyticsAccountId>
     <body>
         <breadcrumbs>
             <item name="Java/JSF Example" href="index.html"/>
