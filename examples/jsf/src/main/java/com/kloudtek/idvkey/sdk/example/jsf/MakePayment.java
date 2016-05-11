@@ -7,6 +7,7 @@ package com.kloudtek.idvkey.sdk.example.jsf;
 import com.kloudtek.idvkey.api.ApprovalRequest;
 import com.kloudtek.idvkey.api.ApprovalRequestStatus;
 import com.kloudtek.idvkey.api.OperationResult;
+import com.kloudtek.idvkey.api.SecurityLevel;
 import com.kloudtek.idvkey.sdk.IDVKeyAPIClient;
 import com.kloudtek.util.JSFUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
@@ -34,6 +36,7 @@ public class MakePayment implements Serializable {
     private transient String websiteId;
     @Autowired
     private transient UserCtx userCtx;
+    @Min(value = 1L, message = "Amount must be at least 1")
     private transient int amount;
     private transient String to;
     private transient String opId;
@@ -45,7 +48,15 @@ public class MakePayment implements Serializable {
         URL cancelUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml?cancel=true"));
         String approvalTitle = "Approve payment";
         String approvalText = "Please approve payment of " + amount + "$ to " + to;
-        ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText);
+        SecurityLevel securityLevel;
+        if (amount <= 50) {
+            securityLevel = SecurityLevel.LOW;
+        } else if (amount <= 1000) {
+            securityLevel = SecurityLevel.STANDARD;
+        } else {
+            securityLevel = SecurityLevel.HIGH;
+        }
+        ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText, securityLevel);
         OperationResult operationResult = apiClient.requestApproval(approvalRequest);
         opId = operationResult.getOpId();
         pendingOperations.put(opId, new Payment(to, amount));
@@ -78,7 +89,7 @@ public class MakePayment implements Serializable {
         this.amount = amount;
     }
 
-    public String getTo() {
+    public String destination() {
         return to;
     }
 
