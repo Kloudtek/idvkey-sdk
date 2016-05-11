@@ -6,7 +6,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
 >
 <h:head>
     <title>Example IDVKey integration website</title>
@@ -29,15 +30,28 @@
             <div id="content">
                 <div id="banner"><img src="images/img07.jpg" alt=""/></div>
                 <h:form>
-                    <p:fieldset legend="Request task to be executed">
-                        <div>
-                            <p:watermark for="taskdetails" value="Task details"/>
-                            <p:inputText id="taskdetails" value="#{requestTask.details}"/>
-                        </div>
+                    <p:fieldset legend="Do payment">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="To:"/>
+                            <p:selectOneListbox>
+                                <f:selectItem itemLabel="Peter Capaldi" itemValue="Peter Capaldi"/>
+                                <f:selectItem itemLabel="Matt Smith" itemValue="Matt Smith"/>
+                                <f:selectItem itemLabel="David Tennant" itemValue="David Tennant"/>
+                                <f:selectItem itemLabel="Christopher Eccleston" itemValue="Christopher Eccleston"/>
+                                <f:selectItem itemLabel="Paul McGann" itemValue="Paul McGann"/>
+                            </p:selectOneListbox>
+                            <h:outputText value="Amount:"/>
+                            <p:inputText/>
+                        </h:panelGrid>
                         <div class="martop">
-                            <p:commandButton value="Submit" actionListener="#{requestTask.submit}" ajax="false"/>
+                            <p:commandButton value="Submit" actionListener="#{makePayment.submit}" ajax="false"/>
                         </div>
                     </p:fieldset>
+                    <ui:remove>
+                        <div>
+                            Note: Payments from 0$ to 50$ will be low security, 50$ to 1000$ standard, and above 1000$ high
+                        </div>
+                    </ui:remove>
                 </h:form>
                 <div style="clear: both;">&nbsp;</div>
             </div>

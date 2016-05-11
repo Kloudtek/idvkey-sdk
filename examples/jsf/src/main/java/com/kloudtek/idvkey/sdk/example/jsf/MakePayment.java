@@ -18,13 +18,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * Created by yannick on 4/2/16.
  */
 @Component
 @Scope("session")
-public class RequestTask implements Serializable {
+public class MakePayment implements Serializable {
+    private static final Logger logger = Logger.getLogger(MakePayment.class.getName());
     private static final long serialVersionUID = 1L;
     @Autowired
     private transient IDVKeyAPIClient apiClient;
@@ -32,42 +34,56 @@ public class RequestTask implements Serializable {
     private transient String websiteId;
     @Autowired
     private transient UserCtx userCtx;
-    private transient String details;
+    private transient int amount;
+    private transient String to;
     private transient String opId;
-    private HashMap<String, String> pendingOperations = new HashMap<String, String>();
+    private HashMap<String, Payment> pendingOperations = new HashMap<String, Payment>();
 
     public void submit() throws IOException {
         String userRef = userCtx.getLinkedUserRef();
-        URL callbackUrl = new URL(JSFUtils.getContextURL("/dorequesttask.xhtml"));
-        URL cancelUrl = new URL(JSFUtils.getContextURL("/dorequesttask.xhtml?cancel=true"));
-        String approvalTitle = "Approve task";
-        String approvalText = "Please approve the following task\n\n" + this.details;
+        URL callbackUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml"));
+        URL cancelUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml?cancel=true"));
+        String approvalTitle = "Approve payment";
+        String approvalText = "Please approve payment of " + amount + "$ to " + to;
         ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText);
         OperationResult operationResult = apiClient.requestApproval(approvalRequest);
         opId = operationResult.getOpId();
-        pendingOperations.put(opId, approvalText);
+        pendingOperations.put(opId, new Payment(to, amount));
         JSFUtils.redirect(operationResult.getRedirectUrl().toString());
     }
 
     public void complete() throws IOException {
         ApprovalRequestStatus approvalState = apiClient.getApprovalState(opId);
         if (approvalState.getState() == ApprovalRequestStatus.State.APPROVED) {
-            details = pendingOperations.get(opId);
-            if (details == null) {
+            Payment payment = pendingOperations.get(opId);
+            if (payment == null) {
                 throw new IllegalArgumentException("Invalid opId");
             }
+            doPayment(payment);
             pendingOperations.remove(opId);
         } else {
             JSFUtils.redirect(JSFUtils.getContextURL("/index.xhtml"));
         }
     }
 
-    public String getDetails() {
-        return details;
+    private void doPayment(Payment payment) {
+        logger.info("Sent payment of " + payment.getAmount() + " to " + payment.getTo());
     }
 
-    public void setDetails(String details) {
-        this.details = details;
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
     }
 
     public String getOpId() {

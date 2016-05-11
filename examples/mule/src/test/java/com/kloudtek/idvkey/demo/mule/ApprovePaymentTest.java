@@ -1,6 +1,6 @@
 package com.kloudtek.idvkey.demo.mule;
 
-import com.kloudtek.muletesthelper.MuleHttpHelper;
+import com.kloudtek.ktutils.testing.mule.MuleUtils;
 import org.junit.Test;
 import org.mule.api.MuleMessage;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -22,7 +22,7 @@ public class ApprovePaymentTest extends FunctionalTestCase {
     @Test
     public void clientTestCase() throws Exception {
         String payload = IOUtils.getResourceAsString("payment1.json", ApprovePaymentTest.class);
-        MuleMessage result = MuleHttpHelper.sendJsonPost(muleContext, "http://localhost:8081", payload);
+        MuleMessage result = MuleUtils.sendHttpJsonPost(muleContext, "http://localhost:8081", payload);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         System.out.println(result.getPayloadAsString());

@@ -12,8 +12,8 @@
     <title>Example IDVKey integration website</title>
     <h:outputStylesheet library="css" name="style.css"/>
     <f:metadata>
-        <f:viewParam name="opId" value="#{requestTask.opId}"/>
-        <f:viewAction action="#{requestTask.complete}"/>
+        <f:viewParam name="opId" value="#{makePayment.opId}"/>
+        <f:viewAction action="#{makePayment.complete}"/>
     </f:metadata>
 </h:head>
 <h:body>
@@ -32,8 +32,7 @@
         <div id="page">
             <div id="content">
                 <div>
-                    Task "<span style="font-weight: bold"><h:outputText
-                        value="#{requestTask.details}"/></span>" has been scheduled for execution.
+                    Payment sent.
                 </div>
                 <div class="martop">
                     <p:link value="back" outcome="/index"/>
