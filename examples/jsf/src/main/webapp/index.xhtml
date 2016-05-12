@@ -32,13 +32,13 @@
                     <p:fieldset legend="Do payment">
                         <h:panelGrid columns="2">
                             <h:outputText value="To:"/>
-                            <p:selectOneListbox value="#{makePayment.destination}">
+                            <p:selectOneMenu value="#{makePayment.destination}">
                                 <f:selectItem itemLabel="Peter Capaldi" itemValue="Peter Capaldi"/>
                                 <f:selectItem itemLabel="Matt Smith" itemValue="Matt Smith"/>
                                 <f:selectItem itemLabel="David Tennant" itemValue="David Tennant"/>
                                 <f:selectItem itemLabel="Christopher Eccleston" itemValue="Christopher Eccleston"/>
                                 <f:selectItem itemLabel="Paul McGann" itemValue="Paul McGann"/>
-                            </p:selectOneListbox>
+                            </p:selectOneMenu>
                             <h:outputText value="Amount:"/>
                             <p:inputText value="#{makePayment.amount}"/>
                         </h:panelGrid>

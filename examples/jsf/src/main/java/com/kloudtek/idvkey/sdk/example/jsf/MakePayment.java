@@ -38,7 +38,7 @@ public class MakePayment implements Serializable {
     private transient UserCtx userCtx;
     @Min(value = 1L, message = "Amount must be at least 1")
     private transient int amount;
-    private transient String to;
+    private transient String destination;
     private transient String opId;
     private HashMap<String, Payment> pendingOperations = new HashMap<String, Payment>();
 
@@ -47,7 +47,7 @@ public class MakePayment implements Serializable {
         URL callbackUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml"));
         URL cancelUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml?cancel=true"));
         String approvalTitle = "Approve payment";
-        String approvalText = "Please approve payment of " + amount + "$ to " + to;
+        String approvalText = "Please approve payment of " + amount + "$ to " + destination;
         SecurityLevel securityLevel;
         if (amount <= 50) {
             securityLevel = SecurityLevel.LOW;
@@ -59,7 +59,7 @@ public class MakePayment implements Serializable {
         ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText, securityLevel);
         OperationResult operationResult = apiClient.requestApproval(approvalRequest);
         opId = operationResult.getOpId();
-        pendingOperations.put(opId, new Payment(to, amount));
+        pendingOperations.put(opId, new Payment(destination, amount));
         JSFUtils.redirect(operationResult.getRedirectUrl().toString());
     }
 
@@ -89,12 +89,12 @@ public class MakePayment implements Serializable {
         this.amount = amount;
     }
 
-    public String destination() {
-        return to;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     public String getOpId() {
