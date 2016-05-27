@@ -13,8 +13,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>java</module>
-        <module>simulator</module>
+        <module>sdks/java</module>
+        <module>tools/simulator</module>
         <module>examples/java-jsf</module>
     </modules>
     <url>https://github.com/Kloudtek/idvkey-sdk</url>
