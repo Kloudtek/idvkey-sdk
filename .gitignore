@@ -807,3 +807,6 @@ fabric.properties
 /*.txt
 /robots.txt.dist
 
+.settings
+.mule
+.idea
