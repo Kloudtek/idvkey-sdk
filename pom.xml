@@ -15,7 +15,7 @@
     <modules>
         <module>java</module>
         <module>simulator</module>
-        <module>examples/jsf</module>
+        <module>examples/java-jsf</module>
     </modules>
     <url>https://github.com/Kloudtek/idvkey-sdk</url>
     <name>IDVKey developer docs</name>

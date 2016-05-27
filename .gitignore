@@ -810,3 +810,4 @@ fabric.properties
 .settings
 .mule
 .idea
+deploy.sh
