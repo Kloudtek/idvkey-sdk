@@ -57,6 +57,7 @@ public class MakePayment implements Serializable {
             securityLevel = SecurityLevel.HIGH;
         }
         ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText, securityLevel);
+        approvalRequest.setShortText("Pay " + amount + "$ to " + destination);
         OperationResult operationResult = apiClient.requestApproval(approvalRequest);
         opId = operationResult.getOpId();
         pendingOperations.put(opId, new Payment(destination, amount));
