@@ -28,6 +28,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URI;
@@ -235,7 +236,7 @@ public class IDVKeyAPIClient {
      */
     public ServiceLink getServiceLinkInfo(String serviceId, String userRef) throws IOException {
         try {
-            return getJson(new URLBuilder("api/services/" + serviceId + "/links/ref/").path(userRef, true).toString(), ServiceLink.class);
+            return getJson(new URLBuilder("api/services").path(serviceId).path("links/ref").path(userRef, true).toString(), ServiceLink.class);
         } catch (HttpException e) {
             if (e.getStatusCode() == 404) {
                 return null;
@@ -246,30 +247,48 @@ public class IDVKeyAPIClient {
     }
 
     /**
-     * Initiate an IDVKey authentication for a user
+     * Initiate an IDVKey authentication for a user, where you have not pre-identified him
      *
      * @param serviceId   Website serviceId
      * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
      * @param cancelUrl   URL that the user's browser should be redirected to if he cancelled the authentication.
+     * @param securityLevel Optional security level for the authentication operation.
      * @return Operation result. This will contain the URL you should redirect your user's browser to.
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException If error occurred performing the operation
      */
-    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl) throws IOException {
-        return postJson("api/notifications/authentication", new AuthenticationRequest(serviceId, redirectUrl, cancelUrl),
-                OperationResult.class);
+    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel) throws IOException {
+        return postJson(new URLBuilder("api/services").path(serviceId).path("notifications/authentication").toString(),
+                new AuthenticationRequest(redirectUrl, cancelUrl, securityLevel), OperationResult.class);
+    }
+
+    /**
+     * Initiate an IDVKey authentication for a user, where you have pre-identified him (so you know his userRef)
+     *
+     * @param serviceId   Website serviceId
+     * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
+     * @param cancelUrl   URL that the user's browser should be redirected to if he cancelled the authentication.
+     * @param securityLevel Optional security level for the authentication operation.
+     * @return Operation result. This will contain the URL you should redirect your user's browser to.
+     * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
+     * authentication successfully ({@link OperationResult#getOpId()})
+     * @throws IOException If error occurred performing the operation
+     */
+    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef) throws IOException {
+        return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, cancelUrl, securityLevel, userRef), OperationResult.class);
     }
 
     /**
      * Confirm that user Authentication was done successfully
      *
-     * @param opId Operation id returned by {@link #authenticateUser(String, URL, URL)}
+     * @param opId Operation id returned by {@link #authenticateUser(String, URL, URL, SecurityLevel)}
+     * @param preIdentified
      * @return Authentication status
      * @throws IOException If error occurred performing the operation
      */
-    public AuthenticationStatus getAuthenticationStatus(@NotNull String opId) throws IOException {
-        return getJson("api/notifications/authentication/" + opId, AuthenticationStatus.class);
+    public AuthenticationRequestStatus getAuthenticationStatus(@NotNull String opId, boolean preIdentified) throws IOException {
+        return getJson(new URLBuilder("api/notifications/authentication/").path(opId).param("preId", preIdentified).toString(), AuthenticationRequestStatus.class);
     }
 
     /**
@@ -280,7 +299,7 @@ public class IDVKeyAPIClient {
      * @throws IOException If an error occurs while performing the operation
      */
     @SuppressWarnings("ConstantConditions")
-    public OperationResult requestApproval(@NotNull ApprovalRequest approvalRequest) throws IOException {
+    public OperationResult requestApproval(@NotNull String serviceId, @NotNull ApprovalRequest approvalRequest) throws IOException {
         if (approvalRequest == null) {
             throw new IllegalArgumentException("approval request missing");
         } else if (StringUtils.isBlank(approvalRequest.getTitle())) {
@@ -288,7 +307,7 @@ public class IDVKeyAPIClient {
         } else if (StringUtils.isBlank(approvalRequest.getText())) {
             throw new IllegalArgumentException("approval text missing");
         }
-        return postJson(new URLBuilder("api/notifications/approval").toString(), approvalRequest, OperationResult.class);
+        return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/approval").toString(), approvalRequest, OperationResult.class);
     }
 
     /**

@@ -4,10 +4,7 @@
 
 package com.kloudtek.idvkey.sdk.example.jsf;
 
-import com.kloudtek.idvkey.api.ApprovalRequest;
-import com.kloudtek.idvkey.api.ApprovalRequestStatus;
-import com.kloudtek.idvkey.api.OperationResult;
-import com.kloudtek.idvkey.api.SecurityLevel;
+import com.kloudtek.idvkey.api.*;
 import com.kloudtek.idvkey.sdk.IDVKeyAPIClient;
 import com.kloudtek.util.JSFUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +53,9 @@ public class MakePayment implements Serializable {
         } else {
             securityLevel = SecurityLevel.HIGH;
         }
-        ApprovalRequest approvalRequest = new ApprovalRequest(websiteId, userRef, callbackUrl, cancelUrl, approvalTitle, approvalText, securityLevel);
+        ApprovalRequest approvalRequest = new ApprovalRequest(userRef, callbackUrl, cancelUrl, approvalTitle, approvalText, securityLevel);
         approvalRequest.setShortText("Pay " + amount + "$ to " + destination);
-        OperationResult operationResult = apiClient.requestApproval(approvalRequest);
+        OperationResult operationResult = apiClient.requestApproval(websiteId, approvalRequest);
         opId = operationResult.getOpId();
         pendingOperations.put(opId, new Payment(destination, amount));
         JSFUtils.redirect(operationResult.getRedirectUrl().toString());
@@ -66,7 +63,7 @@ public class MakePayment implements Serializable {
 
     public void complete() throws IOException {
         ApprovalRequestStatus approvalState = apiClient.getApprovalState(opId);
-        if (approvalState.getState() == ApprovalRequestStatus.State.APPROVED) {
+        if (approvalState.getStatus() == ApprovalStatus.APPROVED) {
             Payment payment = pendingOperations.get(opId);
             if (payment == null) {
                 throw new IllegalArgumentException("Invalid opId");
