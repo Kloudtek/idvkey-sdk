@@ -27,7 +27,7 @@
             <div class="ui-grid ui-grid-responsive">
                 <div class="ui-grid-row">
                     <div class="ui-grid-col-6">
-                        <p:fieldset legend="Normal Login">
+                        <p:fieldset legend="Authentication method 1: Pre-Identified">
                             <h:form prependId="false">
                                 <div style="margin-top: 10px">
                                     <h:panelGrid columns="2" cellpadding="5">
@@ -48,17 +48,12 @@
                         </p:fieldset>
                     </div>
                     <div class="ui-grid-col-6">
-                        <p:fieldset legend="Federated Logins">
+                        <p:fieldset legend="Authentication method 2: IDVKey identification">
                             <h:form>
                                 <h:commandLink actionListener="#{idvkeyAuth.login}" styleClass="loginwith">
                                     <h:graphicImage url="https://www.idvkey.com/login-with.png"/>
                                 </h:commandLink>
                             </h:form>
-                            <div>
-                                Note: In addition to the "federation"-style authentication (where the user will only need to enter username/password in the IDVKey website),
-                                IDVKey also allows the authentication scenario where the website itself authenticates the user with username/password and then requests the user to approve authentication
-                                using IDVKey.
-                            </div>
                             <div>This is currently not implemented in this demo but we will add that soon</div>
                         </p:fieldset>
                     </div>
@@ -66,6 +61,14 @@
             </div>
             <div style="margin-top: 10px">
                 <h:link outcome="register">Register new user</h:link>
+            </div>
+            <div>
+                Note: Before IDVKey can be used to approve authentication, the user must be identified. This is done by
+                having them enter a username/password. This can be done either by the website (method 1), or by IDVKey (method 2).
+            </div>
+            <div>
+                Doing it via IDVKey (our recommended method) is easier for the user (they only need to remember their IDVKey
+                password), and easier to integrate (linking the user's IDVKey to the website is done automatically as part of the authentication).
             </div>
             <div style="clear: both;">&nbsp;</div>
         </div>
