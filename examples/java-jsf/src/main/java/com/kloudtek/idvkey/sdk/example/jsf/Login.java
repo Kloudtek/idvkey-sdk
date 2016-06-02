@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 /**
  * Created by yannick on 1/8/16.
  */
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 public class Login {
     @Autowired
     private UserDb userDb;
+    @Autowired
+    private IDVKeyLogin idvKeyLogin;
     private String username;
     private String password;
 
@@ -47,10 +51,16 @@ public class Login {
         this.userDb = userDb;
     }
 
-    public String login() {
+    public String login() throws IOException {
         final User user = userDb.findUser(username);
         if (user != null && user.comparePassword(password)) {
-            return "index.xhtml";
+            if (user.getIdvkeyId() != null) {
+                idvKeyLogin.setPreIdentifiedUser(user.getUsername());
+                idvKeyLogin.login();
+                return null;
+            } else {
+                return "/index";
+            }
         } else {
             JSFUtils.addErrorMessage(null, "Invalid username / password");
             return null;
@@ -59,6 +69,6 @@ public class Login {
 
     public String logout() {
         JSFUtils.getHttpRequest().getSession().invalidate();
-        return "/index";
+        return "/public/login";
     }
 }

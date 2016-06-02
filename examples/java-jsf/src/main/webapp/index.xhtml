@@ -7,6 +7,7 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
 >
 <h:head>
     <title>Example IDVKey integration website</title>
@@ -28,7 +29,7 @@
         <div id="page">
             <div id="content">
                 <div id="banner"><img src="images/img07.jpg" alt=""/></div>
-                <h:form>
+                <h:form rendered="#{userCtx.linked}">
                     <p:fieldset legend="Do payment">
                         <h:panelGrid columns="2">
                             <h:outputText value="To:"/>
@@ -51,6 +52,14 @@
                         Note: Payments smaller or equals to 50$ will be low security, 50$ to 1000$ standard, and above 1000$ high
                     </div>
                 </h:form>
+                <ui:fragment rendered="#{not userCtx.linked}">
+                    <div style="margin-bottom: 10px">
+                        In order to perform operations, you need to link your IDVKey with this website.
+                    </div>
+                    <div>
+                        <p:commandButton value="Link IDVKey" action="#{idvkeyAuth.link()}"/>
+                    </div>
+                </ui:fragment>
                 <div style="clear: both;">&nbsp;</div>
             </div>
             <!-- end #content -->

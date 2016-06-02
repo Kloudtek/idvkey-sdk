@@ -247,11 +247,12 @@ public class IDVKeyAPIClient {
     }
 
     /**
-     * Initiate an IDVKey authentication for a user, where you have not pre-identified him
+     * Initiate an IDVKey authentication for a user (where IDVKey will identify him). This will automatically link the
+     * user to your service if required.
      *
-     * @param serviceId   Website serviceId
-     * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
-     * @param cancelUrl   URL that the user's browser should be redirected to if he cancelled the authentication.
+     * @param serviceId     Website serviceId
+     * @param redirectUrl   URL that the user's browser should be redirected to after he's performed the authentication.
+     * @param cancelUrl     URL that the user's browser should be redirected to if he cancelled the authentication.
      * @param securityLevel Optional security level for the authentication operation.
      * @return Operation result. This will contain the URL you should redirect your user's browser to.
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
@@ -264,25 +265,36 @@ public class IDVKeyAPIClient {
     }
 
     /**
-     * Initiate an IDVKey authentication for a user, where you have pre-identified him (so you know his userRef)
+     * Initiate an IDVKey authentication for a user where you have pre-identified him.
      *
-     * @param serviceId   Website serviceId
-     * @param redirectUrl URL that the user's browser should be redirected to after he's performed the authentication.
-     * @param cancelUrl   URL that the user's browser should be redirected to if he cancelled the authentication.
+     * @param serviceId     Website serviceId
+     * @param redirectUrl   URL that the user's browser should be redirected to after he's performed the authentication.
+     * @param cancelUrl     URL that the user's browser should be redirected to if he cancelled the authentication.
      * @param securityLevel Optional security level for the authentication operation.
+     * @param userRef       User ref assigned to this user
      * @return Operation result. This will contain the URL you should redirect your user's browser to.
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
-     * @throws IOException If error occurred performing the operation
+     * @throws IOException            If error occurred performing the operation
+     * @throws UserNotLinkedException If the user is not currently linked
      */
-    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef) throws IOException {
-        return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, cancelUrl, securityLevel, userRef), OperationResult.class);
+    public OperationResult authenticatePreIdentifiedUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef)
+            throws IOException, UserNotLinkedException {
+        try {
+            return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, cancelUrl, securityLevel, userRef), OperationResult.class);
+        } catch (HttpException e) {
+            if (e.getStatusCode() == 412) {
+                throw new UserNotLinkedException();
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**
      * Confirm that user Authentication was done successfully
      *
-     * @param opId Operation id returned by {@link #authenticateUser(String, URL, URL, SecurityLevel)}
+     * @param opId          Operation id returned by {@link #authenticateUser(String, URL, URL, SecurityLevel)}
      * @param preIdentified
      * @return Authentication status
      * @throws IOException If error occurred performing the operation

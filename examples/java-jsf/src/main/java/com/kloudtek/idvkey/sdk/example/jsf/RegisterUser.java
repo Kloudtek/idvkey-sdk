@@ -73,7 +73,7 @@ public class RegisterUser {
         } else {
             final User user = userDb.createUser(username, password);
             userCtx.setUser(user);
-            return "loggedin";
+            return "/index";
         }
     }
 }

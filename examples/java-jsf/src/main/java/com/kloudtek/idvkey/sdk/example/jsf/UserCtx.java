@@ -46,4 +46,8 @@ public class UserCtx {
     public String getLinkedUserRef() {
         return user.getIdvkeyId();
     }
+
+    public boolean isLinked() {
+        return user != null && user.getIdvkeyId() != null;
+    }
 }
