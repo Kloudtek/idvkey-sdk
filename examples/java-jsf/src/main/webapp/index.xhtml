@@ -29,29 +29,42 @@
         <div id="page">
             <div id="content">
                 <div id="banner"><img src="images/img07.jpg" alt=""/></div>
-                <h:form rendered="#{userCtx.linked}">
-                    <p:fieldset legend="Do payment">
-                        <h:panelGrid columns="2">
-                            <h:outputText value="To:"/>
-                            <p:selectOneMenu value="#{makePayment.destination}">
-                                <f:selectItem itemLabel="Supplier 1" itemValue="Supplier 1"/>
-                                <f:selectItem itemLabel="Supplier 2" itemValue="Supplier 2"/>
-                                <f:selectItem itemLabel="Supplier 3" itemValue="Supplier 3"/>
-                            </p:selectOneMenu>
-                            <h:outputText value="Amount:"/>
-                            <p:inputText value="#{makePayment.amount}"/>
-                        </h:panelGrid>
-                        <div>
+                <ui:fragment rendered="#{userCtx.linked}">
+                    <h:form>
+                        <p:fieldset legend="Do payment">
+                            <h:panelGrid columns="2">
+                                <h:outputText value="To:"/>
+                                <p:selectOneMenu value="#{makePayment.destination}">
+                                    <f:selectItem itemLabel="Supplier 1" itemValue="Supplier 1"/>
+                                    <f:selectItem itemLabel="Supplier 2" itemValue="Supplier 2"/>
+                                    <f:selectItem itemLabel="Supplier 3" itemValue="Supplier 3"/>
+                                </p:selectOneMenu>
+                                <h:outputText value="Amount:"/>
+                                <p:inputText value="#{makePayment.amount}"/>
+                            </h:panelGrid>
+                            <div>
+                                <p:messages/>
+                            </div>
+                            <div class="martop">
+                                <p:commandButton value="Submit" actionListener="#{makePayment.submit}" ajax="false"/>
+                            </div>
+                        </p:fieldset>
+                        <div style="margin-top: 10px">
+                            Note: Payments smaller or equals to 50$ will be low security, 50$ to 1000$ standard, and above 1000$ high
+                        </div>
+                    </h:form>
+                    <div style="margin-top: 20px">
+                        <h:form>
+                            <p:fieldset legend="Test generic notification">
+                                <p:commandButton actionListener="#{genericNotificationTest.send}" update="@form"/>
+                                <div>
+                                    This will send you a test generic notification
+                                </div>
+                            </p:fieldset>
                             <p:messages/>
-                        </div>
-                        <div class="martop">
-                            <p:commandButton value="Submit" actionListener="#{makePayment.submit}" ajax="false"/>
-                        </div>
-                    </p:fieldset>
-                    <div>
-                        Note: Payments smaller or equals to 50$ will be low security, 50$ to 1000$ standard, and above 1000$ high
+                        </h:form>
                     </div>
-                </h:form>
+                </ui:fragment>
                 <ui:fragment rendered="#{not userCtx.linked}">
                     <div style="margin-bottom: 10px">
                         In order to perform operations, you need to link your IDVKey with this website.

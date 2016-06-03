@@ -62,7 +62,7 @@ public class MakePayment implements Serializable {
     }
 
     public void complete() throws IOException {
-        ApprovalRequestStatus approvalState = apiClient.getApprovalState(opId);
+        ApprovalRequestStatus approvalState = apiClient.getApprovalStatus(opId);
         if (approvalState.getStatus() == ApprovalStatus.APPROVED) {
             Payment payment = pendingOperations.get(opId);
             if (payment == null) {

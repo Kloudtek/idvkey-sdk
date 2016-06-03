@@ -323,14 +323,37 @@ public class IDVKeyAPIClient {
     }
 
     /**
+     * Request for a user to approve an operation using IDVKey
+     *
+     * @param notification Approval request details
+     * @return operation result
+     * @throws IOException If an error occurs while performing the operation
+     */
+    @SuppressWarnings("ConstantConditions")
+    public OperationResult sendGenericNotification(@NotNull String serviceId, @NotNull GenericNotificationRequest notification) throws IOException {
+        return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/generic").toString(), notification, OperationResult.class);
+    }
+
+    /**
      * Check what is the approval state of an operation
      *
      * @param opId Operation Id
      * @return approval state
      * @throws IOException If an error occurs while performing the operation
      */
-    public ApprovalRequestStatus getApprovalState(@NotNull String opId) throws IOException {
+    public ApprovalRequestStatus getApprovalStatus(@NotNull String opId) throws IOException {
         return getJson("api/notifications/approval/" + opId, ApprovalRequestStatus.class);
+    }
+
+    /**
+     * Check what is the approval state of an operation
+     *
+     * @param opId Operation Id
+     * @return approval state
+     * @throws IOException If an error occurs while performing the operation
+     */
+    public GenericNotificationStatus getGenericNotificationStatus(@NotNull String opId) throws IOException {
+        return getJson("api/notifications/generic/" + opId, GenericNotificationStatus.class);
     }
 
     private void checkStatus(CloseableHttpResponse response) throws IOException {
