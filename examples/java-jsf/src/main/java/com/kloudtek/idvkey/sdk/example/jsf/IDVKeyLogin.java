@@ -74,12 +74,12 @@ public class IDVKeyLogin implements Serializable {
         idvkeyId = status.getUserRef();
         User user = userDb.findUserByIdvkeyId(idvkeyId);
         model.addAttribute("attribute", "redirectWithRedirectPrefix");
-        if (user != null) {
-            userCtx.setUser(user);
-            return new ModelAndView("redirect:" + createRelativeUrl("/index.xhtml", request), model);
-        } else {
-            return new ModelAndView("redirect:" + createRelativeUrl("/public/linkidvkey.xhtml", request), model);
+        if (user == null) {
+            user = new User(idvkeyId, "password");
+            user.setIdvkeyId(idvkeyId);
         }
+        userCtx.setUser(user);
+        return new ModelAndView("redirect:" + createRelativeUrl("/index.xhtml", request), model);
     }
 
     private String createRelativeUrl(String path, HttpServletRequest request) {

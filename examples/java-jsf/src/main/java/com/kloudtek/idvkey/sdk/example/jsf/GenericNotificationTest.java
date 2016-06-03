@@ -2,6 +2,7 @@ package com.kloudtek.idvkey.sdk.example.jsf;
 
 import com.kloudtek.idvkey.api.GenericNotificationRequest;
 import com.kloudtek.idvkey.sdk.IDVKeyAPIClient;
+import com.kloudtek.util.JSFUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -30,5 +31,6 @@ public class GenericNotificationTest {
         GenericNotificationRequest.Action action2 = new GenericNotificationRequest.Action("walk", "Walk", "yellow", "Are you sure you want to walk ?", "Have a good walk", GenericNotificationRequest.Location.MAIN_BUTTON);
         apiClient.sendGenericNotification(websiteId, new GenericNotificationRequest(userCtx.getLinkedUserRef(), dummyUrl,
                 dummyUrl, "Test notification", LOREMIPSUM, null, null, action1, action2));
+        JSFUtils.addInfoMessage(null, "Sent notification");
     }
 }

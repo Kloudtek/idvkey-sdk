@@ -55,8 +55,9 @@
                     </h:form>
                     <div style="margin-top: 20px">
                         <h:form>
-                            <p:fieldset legend="Test generic notification">
-                                <p:commandButton actionListener="#{genericNotificationTest.send}" update="@form"/>
+                            <p:fieldset legend="Test generic notifications">
+                                <p:commandButton actionListener="#{genericNotificationTest.send}" update="@form"
+                                                 value="Send Test Notification"/>
                                 <div>
                                     This will send you a test generic notification
                                 </div>
