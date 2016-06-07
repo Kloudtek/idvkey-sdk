@@ -168,7 +168,7 @@ public class IDVKeyAPIClient {
      */
     public OperationResult linkUser(String serviceId, URL url, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException, ServiceNotFoundException {
         try {
-            return jsonMapper.readValue(postJson("api/services/" + serviceId + "/links", new ServiceLinkRequest(userRef, url, cancelUrl)), OperationResult.class);
+            return jsonMapper.readValue(postJson("api/services/" + serviceId + "/links", new ServiceLinkRequest(userRef, url)), OperationResult.class);
         } catch (HttpException e) {
             if (e.getStatusCode() == 409) {
                 throw new UserAlreadyLinkedException();
