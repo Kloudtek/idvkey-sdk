@@ -157,16 +157,15 @@ public class IDVKeyAPIClient {
      * Link an IDVKey user to your service/website.
      * You need to call this operation before a user on your website can use his IDVKey device
      *
-     * @param url       The URL to which the user's browser will be redirected to after he's approved the link
      * @param serviceId Your website serviceId
+     * @param url       The URL to which the user's browser will be redirected to after he's approved the link
      * @param userRef   User reference (generally the user's username on your website)
-     * @param cancelUrl URL to redirect user to should he wish to cancel the linking
      * @return URL you should redirect your user's browser to, in order for him to approve the linking
      * @throws IOException                If an error occurs contacting the server
      * @throws UserAlreadyLinkedException If the user was already linked
      * @throws ServiceNotFoundException   If the service was not found
      */
-    public OperationResult linkUser(String serviceId, URL url, String userRef, URL cancelUrl) throws IOException, UserAlreadyLinkedException, ServiceNotFoundException {
+    public OperationResult linkUser(String serviceId, URL url, String userRef) throws IOException, UserAlreadyLinkedException, ServiceNotFoundException {
         try {
             return jsonMapper.readValue(postJson("api/services/" + serviceId + "/links", new ServiceLinkRequest(userRef, url)), OperationResult.class);
         } catch (HttpException e) {
@@ -200,7 +199,7 @@ public class IDVKeyAPIClient {
     /**
      * Check if a user has been linked against your website.
      * Use this to verify the user has been successfully linked to your website/service after he's been redirected to
-     * the redirectUrl you specified in {@link #linkUser(String, URL, String, URL)}.
+     * the redirectUrl you specified in {@link #linkUser(String, URL, String)}.
      *
      * @param serviceId Website serviceId
      * @param opId      Operation id
@@ -227,7 +226,7 @@ public class IDVKeyAPIClient {
     /**
      * Check if a user has been linked against your website.
      * Use this to verify the user has been successfully linked to your website/service after he's been redirected to
-     * the redirectUrl you specified in {@link #linkUser(String, URL, String, URL)}.
+     * the redirectUrl you specified in {@link #linkUser(String, URL, String)}.
      *
      * @param serviceId Website serviceId
      * @param userRef   User reference (generally the user's username on your website)
@@ -268,7 +267,6 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId     Website serviceId
      * @param redirectUrl   URL that the user's browser should be redirected to after he's performed the authentication.
-     * @param cancelUrl     URL that the user's browser should be redirected to if he cancelled the authentication.
      * @param securityLevel Optional security level for the authentication operation.
      * @param userRef       User ref assigned to this user
      * @return Operation result. This will contain the URL you should redirect your user's browser to.
@@ -277,7 +275,7 @@ public class IDVKeyAPIClient {
      * @throws IOException            If error occurred performing the operation
      * @throws UserNotLinkedException If the user is not currently linked
      */
-    public OperationResult authenticatePreIdentifiedUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef)
+    public OperationResult authenticatePreIdentifiedUser(@NotNull String serviceId, @NotNull URL redirectUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef)
             throws IOException, UserNotLinkedException {
         try {
             return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, securityLevel, userRef), OperationResult.class);

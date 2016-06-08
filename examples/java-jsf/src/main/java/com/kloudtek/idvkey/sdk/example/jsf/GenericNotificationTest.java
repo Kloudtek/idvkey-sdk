@@ -30,7 +30,7 @@ public class GenericNotificationTest {
         GenericNotificationRequest.Action action1 = new GenericNotificationRequest.Action("drive", "Drive", "green", "Are you sure you want to drive ?", "Have a good drive", GenericNotificationRequest.Location.MAIN_BUTTON);
         GenericNotificationRequest.Action action2 = new GenericNotificationRequest.Action("walk", "Walk", "yellow", "Are you sure you want to walk ?", "Have a good walk", GenericNotificationRequest.Location.MAIN_BUTTON);
         apiClient.sendGenericNotification(websiteId, new GenericNotificationRequest(userCtx.getLinkedUserRef(), dummyUrl,
-                dummyUrl, "Test notification", LOREMIPSUM, null, null, action1, action2));
+                "Test notification", LOREMIPSUM, null, null, action1, action2));
         JSFUtils.addInfoMessage(null, "Sent notification");
     }
 }

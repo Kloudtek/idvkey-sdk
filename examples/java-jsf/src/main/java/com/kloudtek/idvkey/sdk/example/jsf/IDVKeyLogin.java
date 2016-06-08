@@ -50,7 +50,7 @@ public class IDVKeyLogin implements Serializable {
         final OperationResult operationResult;
         if (preIdentifiedUser != null) {
             try {
-                operationResult = apiClient.authenticatePreIdentifiedUser(websiteId, callbackUrl, cancelUrl, null, preIdentifiedUser);
+                operationResult = apiClient.authenticatePreIdentifiedUser(websiteId, callbackUrl, null, preIdentifiedUser);
             } catch (UserNotLinkedException e) {
                 // So we'll just remove the idvkeyid (userRef) from the database and login the user normally
                 User user = userDb.findUserByIdvkeyId(preIdentifiedUser);
@@ -90,7 +90,7 @@ public class IDVKeyLogin implements Serializable {
         try {
             URL callbackUrl = new URL(JSFUtils.getContextURL("/rest/verifylink"));
             URL cancelUrl = new URL(JSFUtils.getContextURL("/index.xhtml"));
-            final OperationResult operationResult = apiClient.linkUser(websiteId, callbackUrl, userCtx.getUser().getUsername(), cancelUrl);
+            final OperationResult operationResult = apiClient.linkUser(websiteId, callbackUrl, userCtx.getUser().getUsername());
             // since this bean is session scoped, this will be available later in the verifyAuth call below
             authOpId = operationResult.getOpId();
             JSFUtils.getExternalContext().redirect(operationResult.getRedirectUrl().toString());
