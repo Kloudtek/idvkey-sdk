@@ -60,7 +60,7 @@ public class IDVKeyLogin implements Serializable {
                 return;
             }
         } else {
-            operationResult = apiClient.authenticateUser(websiteId, callbackUrl, cancelUrl, null);
+            operationResult = apiClient.authenticateUser(websiteId, callbackUrl, null);
         }
         // since this bean is session scoped, this will be available later in the verifyAuth call below
         authOpId = operationResult.getOpId();

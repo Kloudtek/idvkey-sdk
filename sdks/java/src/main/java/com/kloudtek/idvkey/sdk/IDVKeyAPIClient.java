@@ -252,16 +252,15 @@ public class IDVKeyAPIClient {
      *
      * @param serviceId     Website serviceId
      * @param redirectUrl   URL that the user's browser should be redirected to after he's performed the authentication.
-     * @param cancelUrl     URL that the user's browser should be redirected to if he cancelled the authentication.
      * @param securityLevel Optional security level for the authentication operation.
      * @return Operation result. This will contain the URL you should redirect your user's browser to.
      * ({@link OperationResult#getRedirectUrl()}), and an operation id that you will use to verify that the user has completed
      * authentication successfully ({@link OperationResult#getOpId()})
      * @throws IOException If error occurred performing the operation
      */
-    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel) throws IOException {
+    public OperationResult authenticateUser(@NotNull String serviceId, @NotNull URL redirectUrl, @Nullable SecurityLevel securityLevel) throws IOException {
         return postJson(new URLBuilder("api/services").path(serviceId).path("notifications/authentication").toString(),
-                new AuthenticationRequest(redirectUrl, cancelUrl, securityLevel), OperationResult.class);
+                new AuthenticationRequest(redirectUrl, securityLevel), OperationResult.class);
     }
 
     /**
@@ -281,7 +280,7 @@ public class IDVKeyAPIClient {
     public OperationResult authenticatePreIdentifiedUser(@NotNull String serviceId, @NotNull URL redirectUrl, URL cancelUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef)
             throws IOException, UserNotLinkedException {
         try {
-            return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, cancelUrl, securityLevel, userRef), OperationResult.class);
+            return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, securityLevel, userRef), OperationResult.class);
         } catch (HttpException e) {
             if (e.getStatusCode() == 412) {
                 throw new UserNotLinkedException();
@@ -294,7 +293,7 @@ public class IDVKeyAPIClient {
     /**
      * Confirm that user Authentication was done successfully
      *
-     * @param opId          Operation id returned by {@link #authenticateUser(String, URL, URL, SecurityLevel)}
+     * @param opId          Operation id returned by {@link #authenticateUser(String, URL, SecurityLevel)}
      * @param preIdentified
      * @return Authentication status
      * @throws IOException If error occurred performing the operation
