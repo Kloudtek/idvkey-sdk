@@ -70,7 +70,12 @@ public class IDVKeyLogin implements Serializable {
     @RequestMapping("/verifyauth")
     public ModelAndView verifyAuth(ModelMap model, HttpServletRequest request) throws IOException {
         // let's verify the user has authenticated successfully before setting him/her as authenticated.
-        AuthenticationRequestStatus status = apiClient.getAuthenticationStatus(authOpId, preIdentifiedUser != null);
+        AuthenticationRequestStatus status;
+        if (preIdentifiedUser != null) {
+            status = apiClient.getPreIdentifiedAuthenticationStatus(authOpId);
+        } else {
+            status = apiClient.getAuthenticationStatus(authOpId);
+        }
         idvkeyId = status.getUserRef();
         User user = userDb.findUserByIdvkeyId(idvkeyId);
         model.addAttribute("attribute", "redirectWithRedirectPrefix");

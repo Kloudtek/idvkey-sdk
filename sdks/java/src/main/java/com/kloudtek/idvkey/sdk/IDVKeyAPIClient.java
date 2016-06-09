@@ -278,7 +278,8 @@ public class IDVKeyAPIClient {
     public OperationResult authenticatePreIdentifiedUser(@NotNull String serviceId, @NotNull URL redirectUrl, @Nullable SecurityLevel securityLevel, @NotNull String userRef)
             throws IOException, UserNotLinkedException {
         try {
-            return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/authentication").toString(), new AuthenticationRequest(redirectUrl, securityLevel, userRef), OperationResult.class);
+            return postJson(new URLBuilder("api/services/").path(serviceId).path("/notifications/preidauthentication").toString(),
+                    new PreIdentifiedAuthenticationRequest(redirectUrl, securityLevel, userRef), OperationResult.class);
         } catch (HttpException e) {
             if (e.getStatusCode() == 412) {
                 throw new UserNotLinkedException();
@@ -292,12 +293,22 @@ public class IDVKeyAPIClient {
      * Confirm that user Authentication was done successfully
      *
      * @param opId          Operation id returned by {@link #authenticateUser(String, URL, SecurityLevel)}
-     * @param preIdentified
      * @return Authentication status
      * @throws IOException If error occurred performing the operation
      */
-    public AuthenticationRequestStatus getAuthenticationStatus(@NotNull String opId, boolean preIdentified) throws IOException {
-        return getJson(new URLBuilder("api/notifications/authentication/").path(opId).param("preId", preIdentified).toString(), AuthenticationRequestStatus.class);
+    public AuthenticationRequestStatus getPreIdentifiedAuthenticationStatus(@NotNull String opId) throws IOException {
+        return getJson(new URLBuilder("api/notifications/preidauthentication/").path(opId).toString(), AuthenticationRequestStatus.class);
+    }
+
+    /**
+     * Confirm that user Authentication was done successfully
+     *
+     * @param opId Operation id returned by {@link #authenticateUser(String, URL, SecurityLevel)}
+     * @return Authentication status
+     * @throws IOException If error occurred performing the operation
+     */
+    public AuthenticationRequestStatus getAuthenticationStatus(@NotNull String opId) throws IOException {
+        return getJson(new URLBuilder("api/notifications/authentication/").path(opId).toString(), AuthenticationRequestStatus.class);
     }
 
     /**
