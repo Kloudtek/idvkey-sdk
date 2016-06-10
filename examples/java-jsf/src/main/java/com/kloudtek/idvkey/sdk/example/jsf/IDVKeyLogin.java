@@ -4,10 +4,7 @@
 
 package com.kloudtek.idvkey.sdk.example.jsf;
 
-import com.kloudtek.idvkey.api.AuthenticationRequestStatus;
-import com.kloudtek.idvkey.api.OperationResult;
-import com.kloudtek.idvkey.api.ServiceLinkRequestStatus;
-import com.kloudtek.idvkey.api.ServiceNotFoundException;
+import com.kloudtek.idvkey.api.*;
 import com.kloudtek.idvkey.sdk.IDVKeyAPIClient;
 import com.kloudtek.idvkey.sdk.UserAlreadyLinkedException;
 import com.kloudtek.idvkey.sdk.UserNotLinkedException;
@@ -46,7 +43,6 @@ public class IDVKeyLogin implements Serializable {
 
     public void login() throws IOException {
         URL callbackUrl = new URL(JSFUtils.getContextURL("/rest/verifyauth"));
-        URL cancelUrl = new URL(JSFUtils.getContextURL("/login.xhtml"));
         final OperationResult operationResult;
         if (preIdentifiedUser != null) {
             try {
@@ -76,14 +72,16 @@ public class IDVKeyLogin implements Serializable {
         } else {
             status = apiClient.getAuthenticationStatus(authOpId);
         }
-        idvkeyId = status.getUserRef();
-        User user = userDb.findUserByIdvkeyId(idvkeyId);
-        model.addAttribute("attribute", "redirectWithRedirectPrefix");
-        if (user == null) {
-            user = new User(idvkeyId, "password");
-            user.setIdvkeyId(idvkeyId);
+        if (status.getStatus() == ApprovalStatus.APPROVED) {
+            idvkeyId = status.getUserRef();
+            User user = userDb.findUserByIdvkeyId(idvkeyId);
+            model.addAttribute("attribute", "redirectWithRedirectPrefix");
+            if (user == null) {
+                user = new User(idvkeyId, "password");
+                user.setIdvkeyId(idvkeyId);
+            }
+            userCtx.setUser(user);
         }
-        userCtx.setUser(user);
         return new ModelAndView("redirect:" + createRelativeUrl("/index.xhtml", request), model);
     }
 
@@ -94,7 +92,6 @@ public class IDVKeyLogin implements Serializable {
     public void link() throws ServiceNotFoundException, IOException {
         try {
             URL callbackUrl = new URL(JSFUtils.getContextURL("/rest/verifylink"));
-            URL cancelUrl = new URL(JSFUtils.getContextURL("/index.xhtml"));
             final OperationResult operationResult = apiClient.linkUser(websiteId, callbackUrl, userCtx.getUser().getUsername());
             // since this bean is session scoped, this will be available later in the verifyAuth call below
             authOpId = operationResult.getOpId();
