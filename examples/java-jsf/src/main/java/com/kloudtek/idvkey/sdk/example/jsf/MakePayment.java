@@ -42,7 +42,6 @@ public class MakePayment implements Serializable {
     public void submit() throws IOException {
         String userRef = userCtx.getLinkedUserRef();
         URL callbackUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml"));
-        URL cancelUrl = new URL(JSFUtils.getContextURL("/paymentsent.xhtml?cancel=true"));
         String approvalTitle = "Approve payment";
         String approvalText = "Please approve payment of " + amount + "$ to " + destination;
         SecurityLevel securityLevel;
