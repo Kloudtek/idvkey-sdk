@@ -37,7 +37,7 @@
     <properties>
         <repo.oss.snapshot.url/>
         <repo.oss.release.url/>
-        <kryptotek-oss.version>1.0.14</kryptotek-oss.version>
+        <kryptotek-oss.version>1.0.18</kryptotek-oss.version>
         <ktutils.version>1.2.11</ktutils.version>
         <gpg.key/>
     </properties>
