@@ -105,7 +105,7 @@ public class IDVKeyLogin implements Serializable {
     @RequestMapping("/verifylink")
     public ModelAndView verifyLink(ModelMap model, HttpServletRequest request) throws IOException {
         ServiceLinkRequestStatus status = apiClient.getServiceLinkRequestStatus(idvkeyId, authOpId);
-        if (status == ServiceLinkRequestStatus.ACCEPTED) {
+        if (status.getStatus() == ServiceLinkRequestStatusType.ACCEPTED) {
             userCtx.getUser().setIdvkeyId(userCtx.getUser().getUsername());
         }
         return new ModelAndView("redirect:" + createRelativeUrl("/index.xhtml", request), model);

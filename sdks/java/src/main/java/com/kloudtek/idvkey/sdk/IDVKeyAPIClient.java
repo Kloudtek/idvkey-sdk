@@ -208,12 +208,7 @@ public class IDVKeyAPIClient {
      */
     public ServiceLinkRequestStatus getServiceLinkRequestStatus(String serviceId, String opId) throws IOException {
         try {
-            String statusStr = get(new URLBuilder("api/services/" + serviceId + "/links/requests/").path(opId, true).toString());
-            try {
-                return ServiceLinkRequestStatus.valueOf(statusStr);
-            } catch (IllegalArgumentException e) {
-                throw new IOException("Server returned invalid status value: " + statusStr);
-            }
+            return getJson(new URLBuilder("api/services/" + serviceId + "/links/requests/").path(opId, true).toString(),ServiceLinkRequestStatus.class);
         } catch (HttpException e) {
             if (e.getStatusCode() == 404) {
                 return null;
@@ -314,6 +309,7 @@ public class IDVKeyAPIClient {
     /**
      * Request for a user to approve an operation using IDVKey
      *
+     * @param serviceId Service id
      * @param approvalRequest Approval request details
      * @return operation result
      * @throws IOException If an error occurs while performing the operation
@@ -333,6 +329,7 @@ public class IDVKeyAPIClient {
     /**
      * Request for a user to approve an operation using IDVKey
      *
+     * @param serviceId Service id
      * @param notification Approval request details
      * @return operation result
      * @throws IOException If an error occurs while performing the operation
@@ -360,8 +357,8 @@ public class IDVKeyAPIClient {
      * @return approval state
      * @throws IOException If an error occurs while performing the operation
      */
-    public GenericNotificationStatus getGenericNotificationStatus(@NotNull String opId) throws IOException {
-        return getJson("api/notifications/generic/" + opId, GenericNotificationStatus.class);
+    public GenericNotificationRequestStatus getGenericNotificationStatus(@NotNull String opId) throws IOException {
+        return getJson("api/notifications/generic/" + opId, GenericNotificationRequestStatus.class);
     }
 
     private void checkStatus(CloseableHttpResponse response) throws IOException {

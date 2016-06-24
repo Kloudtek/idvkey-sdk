@@ -20,7 +20,7 @@
         <menu name="Docs &amp; Tools">
             <item name="Using IDVKey APIs" href="http://www.idvkey.com/support/dev/using-apis.html"/>
             <item name="API Security" href="http://www.idvkey.com/support/dev/api-security.html"/>
-            <item name="API Documentation" href="http://www.idvkey.com/support/dev/raml/idvkey.html"/>
+            <item name="API Documentation" href="http://www.idvkey.com/support/dev/raml/idvkey-raml.html"/>
             <item name="API RAML specs" href="http://www.idvkey.com/support/dev/raml/idvkey-raml.zip"/>
         </menu>
         <menu ref="reports"/>
