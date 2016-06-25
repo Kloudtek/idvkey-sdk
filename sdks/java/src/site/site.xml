@@ -11,7 +11,7 @@
             <item name="Java SDK" href="index.html"/>
         </breadcrumbs>
         <menu name="SDKs">
-            <item name="Java" href="http://www.idvkey.com/support/dev/sdk/idvkey-sdk-java/index.html"/>
+            <item name="Java" href="http://www.idvkey.com/support/dev/sdk/sdks/idvkey-sdk-java/index.html"/>
         </menu>
         <menu name="Examples">
             <item name="Java / JSF"
